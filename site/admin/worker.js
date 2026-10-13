@@ -213,6 +213,11 @@ async function handleApi(request,env){
     const b=await request.json().catch(()=>({})),list=await readDevices(env),id=String(b.deviceId||''),d=list.find(x=>x.deviceId===id);
     if(!d)return withCors(json({ok:false,error:'Device not found'},404));Object.assign(d,b);await saveDevices(env,list);return withCors(json({ok:true,device:d}));
   }
+  if(path==='/api/admin/devices'&&request.method==='DELETE'&&url.searchParams.get('all')==='true'){
+    const list=await readDevices(env);
+    await saveDevices(env,[]);
+    return withCors(json({ok:true,removedCount:list.length}));
+  }
   if(path==='/api/admin/devices'&&request.method==='DELETE'){
     const id=url.searchParams.get('deviceId')||'',list=(await readDevices(env)).filter(x=>x.deviceId!==id);await saveDevices(env,list);return withCors(json({ok:true}))
   }
