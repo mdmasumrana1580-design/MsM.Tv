@@ -432,9 +432,9 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
   const originalUrl = String(c.url || "").trim();
   let fallbackUsed = !retryOriginal && c._usingFallback === true;
   const sourceUrl = fallbackUsed ? STREAM_FALLBACK_URL : originalUrl;
-  // HTTP HLS cannot be loaded directly from an HTTPS page. Route only HTTP
-  // M3U8 sources through the site worker; HTTPS sources remain unchanged.
-  const playbackUrl = (/^http:\/\//i.test(sourceUrl) && /\.m3u8(?:\?|$)/i.test(sourceUrl))
+  // HTTPS pages cannot play HTTP media directly (mixed-content blocking).
+  // Route all HTTP media through the site's HTTPS stream proxy; keep HTTPS URLs direct.
+  const playbackUrl = /^http:\/\//i.test(sourceUrl)
     ? (location.origin + '/api/stream-proxy?url=' + encodeURIComponent(sourceUrl))
     : sourceUrl;
 
