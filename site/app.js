@@ -9,6 +9,8 @@ let current = "All";
 let hls = null;
 let currentChannelIndex = -1;
 let visibleChannels = [];
+let catalogueRenderLimit = 60;
+const CATALOGUE_PAGE_SIZE = 60;
 let playerReturnScrollY = 0;
 let playerReturnGridScrollTop = 0;
 let playerFullscreenGridScrollTop = 0;
@@ -329,44 +331,47 @@ function fitChannelLabels(root) {
 
 function render() {
   const q = "";
-
   grid.innerHTML = "";
-
   const selectedCategory = normalizeCategoryKey(current);
   const list = channels.filter(function (c) {
     const categoryOk = selectedCategory === "ALL" || normalizeCategoryKey(c.cat) === selectedCategory;
-    const searchOk = c.name.toLowerCase().includes(q);
+    const searchOk = String(c.name || "").toLowerCase().includes(q);
     return categoryOk && searchOk;
   });
   visibleChannels = list;
-
   empty.hidden = list.length > 0;
-  if (!list.length) {
-    empty.textContent = channels.length ? "No channels found" : "Loading channels...";
-  }
+  if (!list.length) empty.textContent = channels.length ? "No channels found" : "Loading channels...";
 
-  list.forEach(function (c) {
+  // Render only a small batch of cards. The complete catalogue remains searchable/playable,
+  // while the DOM stays lightweight for large Movie & Series playlists.
+  const shown = list.slice(0, catalogueRenderLimit);
+  shown.forEach(function (c) {
     const el = document.createElement("article");
     el.className = "card";
-
     const icon = c.logo
-      ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy">'
+      ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy" decoding="async">'
       : "<span>TV</span>";
-    const isPaid = getChannelAccess(c.name) === 'paid';
-
     el.innerHTML =
       '<div class="circle">' + icon + '</div>' +
-      '<img class="vip-paid-crown" src="https://i.postimg.cc/g05JdqSY/Blue-Star-symbol.png" alt="Channel star" title="Channel">' +
+      '<img class="vip-paid-crown" loading="lazy" src="https://i.postimg.cc/g05JdqSY/Blue-Star-symbol.png" alt="Channel star" title="Channel">' +
       '<div class="label"><span class="label-text">' + esc(c.name) + '</span></div>';
-
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      play(c, el, false, true);
-    });
-
+    el.addEventListener("click", function (e) { e.preventDefault(); play(c, el, false, true); });
     grid.appendChild(el);
     fitChannelLabels(el);
   });
+
+  let more = document.getElementById("catalogueLoadMore");
+  if (!more) {
+    more = document.createElement("button");
+    more.id = "catalogueLoadMore";
+    more.type = "button";
+    more.className = "catalogue-load-more";
+    more.style.cssText = "display:block;margin:18px auto;padding:12px 22px;border:0;border-radius:10px;font-weight:700;cursor:pointer";
+    more.addEventListener("click", function () { catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); });
+    grid.insertAdjacentElement("afterend", more);
+  }
+  more.hidden = shown.length >= list.length;
+  more.textContent = "Load more (" + Math.min(CATALOGUE_PAGE_SIZE, list.length - shown.length) + ") · " + shown.length + "/" + list.length;
 }
 
 function play(c, clickedCard, retryOriginal, fromUserClick) {
@@ -683,6 +688,7 @@ document.querySelectorAll("#cats button").forEach(function (button) {
 
     button.classList.add("active");
     current = normalizeCategoryKey(button.dataset.cat);
+    catalogueRenderLimit = CATALOGUE_PAGE_SIZE;
     render();
   });
 });
