@@ -329,7 +329,21 @@ function fitChannelLabels(root) {
   });
 }
 
+function ensureRgbLoadMoreStyle() {
+  if (document.getElementById("rgbLoadMoreStyle")) return;
+  const style = document.createElement("style");
+  style.id = "rgbLoadMoreStyle";
+  style.textContent = `
+    .catalogue-load-more { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #fff !important; font-weight: 800 !important; letter-spacing: .2px; text-shadow: none !important; animation: msmtv-rgb-text 3.2s linear infinite; -webkit-tap-highlight-color: transparent; }
+    .catalogue-load-more:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+    @keyframes msmtv-rgb-text { 0%{color:#fff} 16%{color:#ff3434} 33%{color:#ffdf35} 50%{color:#24f06a} 66%{color:#32dfff} 83%{color:#b45cff} 100%{color:#fff} }
+    @media (prefers-reduced-motion: reduce) { .catalogue-load-more { animation: none; color: #fff !important; } }
+  `;
+  document.head.appendChild(style);
+}
+
 function render() {
+  ensureRgbLoadMoreStyle();
   const q = "";
   grid.innerHTML = "";
   const selectedCategory = normalizeCategoryKey(current);
@@ -366,12 +380,12 @@ function render() {
     more.id = "catalogueLoadMore";
     more.type = "button";
     more.className = "catalogue-load-more";
-    more.style.cssText = "display:block;margin:18px auto;padding:12px 22px;border:0;border-radius:10px;font-weight:700;cursor:pointer";
-    more.addEventListener("click", function () { catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); });
+    more.style.cssText = "display:block;margin:18px auto;padding:12px 22px;background:transparent;border:0;box-shadow:none;font-weight:800;cursor:pointer";
+    more.addEventListener("click", function () { const y = window.scrollY || window.pageYOffset || 0; catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); requestAnimationFrame(function () { window.scrollTo({ top: y, behavior: "auto" }); }); });
     grid.insertAdjacentElement("afterend", more);
   }
   more.hidden = shown.length >= list.length;
-  more.textContent = "Load more (" + Math.min(CATALOGUE_PAGE_SIZE, list.length - shown.length) + ") · " + shown.length + "/" + list.length;
+  more.textContent = "আরও দেখুন (" + Math.min(CATALOGUE_PAGE_SIZE, list.length - shown.length) + ") · " + shown.length + "/" + list.length;
 }
 
 function play(c, clickedCard, retryOriginal, fromUserClick) {
