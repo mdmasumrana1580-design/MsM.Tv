@@ -383,8 +383,11 @@ function render() {
     more.addEventListener("click", function () { const y = window.scrollY || window.pageYOffset || 0; catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); requestAnimationFrame(function () { window.scrollTo({ top: y, behavior: "auto" }); }); });
     grid.insertAdjacentElement("afterend", more);
   }
-  more.hidden = shown.length >= list.length;
-  more.textContent = "আরও দেখুন (" + Math.min(CATALOGUE_PAGE_SIZE, list.length - shown.length) + ") · " + shown.length + "/" + list.length;
+  // Show the load-more counter only in Movie & Series.
+  // Format: current visible count / total items in this category.
+  const isMovieSeriesCategory = selectedCategory === "MOVIE & SERIES";
+  more.hidden = !isMovieSeriesCategory || shown.length >= list.length;
+  more.textContent = "আরও দেখুন (" + shown.length + "/" + list.length + ")";
 }
 
 function play(c, clickedCard, retryOriginal, fromUserClick) {
