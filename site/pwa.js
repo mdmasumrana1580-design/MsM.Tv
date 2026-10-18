@@ -109,7 +109,11 @@ let deferredPrompt = null;
       window.addEventListener('focus',()=>registration.update().catch(()=>{}));
     }catch(e){}
   }
-  // Avoid forced reload when service-worker control changes; this can reset the PWA to its first page on Android TV.
-  navigator.serviceWorker?.addEventListener('controllerchange',()=>{ refreshing = false; });
+
+  navigator.serviceWorker?.addEventListener('controllerchange',()=>{
+    if(refreshing)return;
+    refreshing=true;
+    window.location.reload();
+  });
   window.addEventListener('load',registerSW);
 })();
