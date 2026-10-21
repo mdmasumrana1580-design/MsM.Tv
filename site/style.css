@@ -3599,13 +3599,13 @@ video{
   animation-duration: 90s !important;
 }
 
-/* MsM.Tv notice text: slightly larger for easier reading; keep slow scrolling. */
+/* MsM.Tv notice text: extra-large and slow scrolling. */
 .headline-track {
-  font-size: 19px !important;
+  font-size: 23px !important;
   animation-duration: 90s !important;
 }
 @media (max-width: 600px) {
   .headline-track {
-    font-size: 18px !important;
+    font-size: 21px !important;
   }
 }
