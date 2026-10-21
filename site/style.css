@@ -3598,3 +3598,14 @@ video{
 .headline-track {
   animation-duration: 90s !important;
 }
+
+/* MsM.Tv notice text: slightly larger for easier reading; keep slow scrolling. */
+.headline-track {
+  font-size: 19px !important;
+  animation-duration: 90s !important;
+}
+@media (max-width: 600px) {
+  .headline-track {
+    font-size: 18px !important;
+  }
+}
