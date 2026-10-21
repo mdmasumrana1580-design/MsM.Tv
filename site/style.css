@@ -3592,3 +3592,9 @@ video{
 .player-section[hidden]{display:none !important;visibility:hidden !important;}
 .player-section:not([hidden]){visibility:visible !important;}
 .video-box > #video{visibility:visible !important;opacity:1 !important;}
+
+
+/* MsM.Tv notice readability fix: slow the scrolling message without changing its design. */
+.headline-track {
+  animation-duration: 90s !important;
+}
