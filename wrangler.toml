@@ -1,4 +1,5 @@
-name = "vip-network-tv"
+
+name = 'msm'
 main = "worker.js"
 compatibility_date = "2026-09-05"
 
