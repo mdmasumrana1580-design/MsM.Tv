@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://msm.masum-tv.workers.dev/sitemap.xml

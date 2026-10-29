@@ -1,7 +1,7 @@
 {
-  "name": "ViP-TV",
-  "short_name": "ViP-TV",
-  "description": "ViP Network Live TV Web App",
+  "name": "MsM.Tv",
+  "short_name": "MsM.Tv",
+  "description": "MsM.Tv — লাইভ টিভি ও বিনোদন",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -15,12 +15,12 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "vip-tv-logo-192.png",
+      "src": "msm-tv-logo-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "vip-tv-logo-512.png",
+      "src": "msm-tv-logo-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
