@@ -1,1 +1,3 @@
-User-agent: *\nAllow: /\nSitemap: https://msm.masum-tv.workers.dev/sitemap.xml\n
+User-agent: *
+Allow: /
+Sitemap: https://msm.masum-tv.workers.dev/sitemap.xml
