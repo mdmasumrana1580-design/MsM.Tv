@@ -3678,3 +3678,28 @@ video{
     line-height: 26px;
   }
 }
+
+
+
+/* Search field stays directly below Notice; categories are shifted beneath it. */
+.channel-search-wrap {
+  position: relative !important;
+  z-index: 941 !important;
+}
+.cats {
+  top: calc(var(--vip-header-h,64px) + var(--vip-player-h,56.25vw) + var(--vip-headline-h,38px) + 42px) !important;
+}
+.blue-line {
+  top: calc(var(--vip-header-h,64px) + var(--vip-player-h,56.25vw) + var(--vip-headline-h,38px) + 42px + var(--vip-cat-h,50px)) !important;
+}
+#grid {
+  padding-top: calc(var(--vip-cat-h,50px) + 10px) !important;
+}
+@media (max-width: 420px) {
+  .cats {
+    top: calc(var(--vip-header-h,64px) + var(--vip-player-h,56.25vw) + var(--vip-headline-h,32px) + 42px) !important;
+  }
+  .blue-line {
+    top: calc(var(--vip-header-h,64px) + var(--vip-player-h,56.25vw) + var(--vip-headline-h,32px) + 42px + var(--vip-cat-h,50px)) !important;
+  }
+}
