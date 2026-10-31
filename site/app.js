@@ -34,6 +34,7 @@ async function loadChannelAccess(){
 
 const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
+const channelSearch = document.getElementById("channelSearch");
 const video = document.getElementById("video");
 const section = document.getElementById("playerSection");
 const welcomeVideo = document.getElementById("welcomeVideo");
@@ -344,17 +345,18 @@ function ensureRgbLoadMoreStyle() {
 
 function render() {
   ensureRgbLoadMoreStyle();
-  const q = "";
+  const q = channelSearch ? channelSearch.value.trim().toLocaleLowerCase() : "";
   grid.innerHTML = "";
   const selectedCategory = normalizeCategoryKey(current);
   const list = channels.filter(function (c) {
-    const categoryOk = selectedCategory === "ALL" || normalizeCategoryKey(c.cat) === selectedCategory;
-    const searchOk = String(c.name || "").toLowerCase().includes(q);
+    const categoryOk = q ? true : (selectedCategory === "ALL" || normalizeCategoryKey(c.cat) === selectedCategory);
+    const name = String(c.name || "").trim().toLocaleLowerCase();
+    const searchOk = !q || name.startsWith(q);
     return categoryOk && searchOk;
   });
   visibleChannels = list;
   empty.hidden = list.length > 0;
-  if (!list.length) empty.textContent = channels.length ? "No channels found" : "Loading channels...";
+  if (!list.length) empty.textContent = channels.length ? "দুঃখিত! কোনো চ্যানেল পাওয়া যায়নি" : "Loading channels...";
 
   // Render only a small batch of cards. The complete catalogue remains searchable/playable,
   // while the DOM stays lightweight for large Movie & Series playlists.
@@ -708,6 +710,13 @@ document.querySelectorAll("#cats button").forEach(function (button) {
     render();
   });
 });
+
+if (channelSearch) {
+  channelSearch.addEventListener("input", function () {
+    currentChannelIndex = -1;
+    render();
+  });
+}
 
 empty.hidden = false;
 empty.textContent = "Loading channels...";
