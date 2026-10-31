@@ -35,6 +35,7 @@ async function loadChannelAccess(){
 const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
 const channelSearch = document.getElementById("channelSearch");
+const channelFooter = document.querySelector(".site-footer");
 const video = document.getElementById("video");
 const section = document.getElementById("playerSection");
 const welcomeVideo = document.getElementById("welcomeVideo");
@@ -383,13 +384,18 @@ function render() {
     more.type = "button";
     more.className = "catalogue-load-more";
     more.style.cssText = "margin:18px auto;padding:12px 22px;background:transparent;border:0;box-shadow:none;font-weight:800;cursor:pointer";
-    more.addEventListener("click", function () { const y = window.scrollY || window.pageYOffset || 0; catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); requestAnimationFrame(function () { window.scrollTo({ top: y, behavior: "auto" }); }); });
-    grid.insertAdjacentElement("afterend", more);
+    more.addEventListener("click", function () {
+      catalogueRenderLimit += CATALOGUE_PAGE_SIZE;
+      render();
+    });
   }
-  // Show load-more for every category, including All. Large playlists are rendered in
-  // batches, so recently added channels beyond the first batch remain reachable in All.
+  // Keep the count/load-more control inside the scrollable channel list.
   more.hidden = shown.length >= list.length;
   more.textContent = "আরও দেখুন (" + shown.length + "/" + list.length + ")";
+  grid.appendChild(more);
+
+  // Copyright belongs after the channel catalogue, not over the first row.
+  if (channelFooter) grid.appendChild(channelFooter);
 }
 
 function play(c, clickedCard, retryOriginal, fromUserClick) {

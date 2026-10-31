@@ -3768,3 +3768,30 @@ video{
     top: calc(var(--vip-header-h,64px) + var(--vip-player-h,56.25vw) + var(--vip-headline-h,32px) + var(--vip-search-h,40px) + var(--vip-cat-h,50px) + 8px) !important;
   }
 }
+
+
+
+/* Keep catalogue count and copyright after the channel cards, inside the scroll area. */
+#grid > .catalogue-load-more,
+#grid > .site-footer {
+  grid-column: 1 / -1 !important;
+  position: relative !important;
+  inset: auto !important;
+  float: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 1 !important;
+}
+#grid > .catalogue-load-more[hidden] {
+  display: none !important;
+}
+#grid > .site-footer {
+  display: block !important;
+  margin: 10px 0 18px !important;
+  padding: 10px 8px 22px !important;
+  text-align: center !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+  color: #8ea1ad !important;
+  white-space: normal !important;
+}
