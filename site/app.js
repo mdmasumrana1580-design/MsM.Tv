@@ -385,8 +385,13 @@ function render() {
     more.className = "catalogue-load-more";
     more.style.cssText = "margin:18px auto;padding:12px 22px;background:transparent;border:0;box-shadow:none;font-weight:800;cursor:pointer";
     more.addEventListener("click", function () {
+      // Preserve the channel-list scroll position while appending the next batch.
+      const previousScrollTop = grid.scrollTop;
       catalogueRenderLimit += CATALOGUE_PAGE_SIZE;
       render();
+      requestAnimationFrame(function () {
+        grid.scrollTop = previousScrollTop;
+      });
     });
   }
   // Keep the count/load-more control inside the scrollable channel list.
