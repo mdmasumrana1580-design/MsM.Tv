@@ -347,31 +347,11 @@ function render() {
   const q = "";
   grid.innerHTML = "";
   const selectedCategory = normalizeCategoryKey(current);
-  let list = channels.filter(function (c) {
+  const list = channels.filter(function (c) {
     const categoryOk = selectedCategory === "ALL" || normalizeCategoryKey(c.cat) === selectedCategory;
     const searchOk = String(c.name || "").toLowerCase().includes(q);
     return categoryOk && searchOk;
   });
-
-  // In All, group channels by the visible category-tab order.
-  // Preserve the original order inside each category, so newly added channels
-  // remain at the end of their category instead of jumping to the top of All.
-  if (selectedCategory === "ALL") {
-    const categoryOrder = Array.from(document.querySelectorAll("#cats button"))
-      .map(function (button) { return normalizeCategoryKey(button.dataset.cat); })
-      .filter(function (cat) { return cat && cat !== "ALL"; });
-    const rank = new Map(categoryOrder.map(function (cat, index) { return [cat, index]; }));
-    list = list.map(function (channel, index) { return { channel: channel, index: index }; })
-      .sort(function (a, b) {
-        const ca = normalizeCategoryKey(a.channel.cat);
-        const cb = normalizeCategoryKey(b.channel.cat);
-        const ra = rank.has(ca) ? rank.get(ca) : categoryOrder.length;
-        const rb = rank.has(cb) ? rank.get(cb) : categoryOrder.length;
-        return ra - rb || a.index - b.index;
-      })
-      .map(function (item) { return item.channel; });
-  }
-
   visibleChannels = list;
   empty.hidden = list.length > 0;
   if (!list.length) empty.textContent = channels.length ? "No channels found" : "Loading channels...";
@@ -404,10 +384,9 @@ function render() {
     more.addEventListener("click", function () { const y = window.scrollY || window.pageYOffset || 0; catalogueRenderLimit += CATALOGUE_PAGE_SIZE; render(); requestAnimationFrame(function () { window.scrollTo({ top: y, behavior: "auto" }); }); });
     grid.insertAdjacentElement("afterend", more);
   }
-  // Show the load-more counter only in Movie & Series.
-  // Format: current visible count / total items in this category.
-  const isMovieSeriesCategory = selectedCategory === "MOVIE & SERIES";
-  more.hidden = !isMovieSeriesCategory || shown.length >= list.length;
+  // Show load-more for every category, including All. Large playlists are rendered in
+  // batches, so recently added channels beyond the first batch remain reachable in All.
+  more.hidden = shown.length >= list.length;
   more.textContent = "আরও দেখুন (" + shown.length + "/" + list.length + ")";
 }
 
