@@ -3796,12 +3796,10 @@ video{
   white-space: normal !important;
 }
 
-
-/* Android TV remote / keyboard focus visibility */
-#cats button:focus-visible, #grid .card:focus-visible,
-#closePlayer:focus-visible, #prevChannel:focus-visible,
-#nextChannel:focus-visible, #vipMute:focus-visible,
-#vipFullscreen:focus-visible {
+/* Android TV remote focus */
+#cats button:focus, #grid .card:focus, #closePlayer:focus,
+#prevChannel:focus, #nextChannel:focus, #vipMute:focus,
+#vipFullscreen:focus, #installAppBtn:focus {
   outline: 3px solid #ffd54a !important;
   outline-offset: 4px;
   box-shadow: 0 0 0 5px rgba(255,213,74,.22);
