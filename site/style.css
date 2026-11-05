@@ -3806,235 +3806,131 @@ video{
 }
 
 
-/* ===== MsM.Tv: phone landscape + desktop page layout fix =====
-   Portrait/mobile rules above remain untouched.
-*/
-@media (orientation: landscape) and (min-width: 700px) {
-  body {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1.55fr) minmax(310px, 1fr);
-    grid-template-rows: auto auto auto auto auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "header header"
-      "player grid"
-      "headline grid"
-      "cats grid"
-      "blue grid"
-      "topbar grid"
-      "footer footer";
-    align-items: start;
-    column-gap: 12px;
-    row-gap: 0;
-    padding: 0 12px;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  .header {
-    grid-area: header !important;
-    width: calc(100% + 24px);
-    margin-left: -12px;
-    min-width: 0;
-    padding: 0 20px;
-    height: 72px;
-    position: relative;
-  }
-  .player-section {
-    grid-area: player !important;
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0;
-    margin: 12px 0 7px !important;
-    padding: 8px !important;
-    align-self: start;
-  }
-  .player-head { height: 28px !important; }
-  .video-box {
-    width: 100% !important;
-    aspect-ratio: 16 / 9 !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-  #playerSpacer { display: none !important; height: 0 !important; }
-  .headline {
-    grid-area: headline !important;
-    width: 100%;
-    margin: 0 0 7px !important;
-    height: 34px;
-  }
-  .cats {
-    grid-area: cats !important;
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    overflow: visible;
-    padding: 7px 0 10px !important;
-  }
-  .cats button {
-    min-width: 0 !important;
-    height: 36px !important;
-    padding: 0 12px !important;
-    font-size: clamp(11px, 1.25vw, 15px) !important;
-  }
-  .blue-line {
-    grid-area: blue !important;
-    width: 42%;
-    height: 4px;
-    margin: 0 0 8px !important;
-  }
-  .channel-topbar { grid-area: topbar !important; min-height: 0; }
-  #grid, .grid {
-    grid-area: grid !important;
-    width: 100% !important;
-    min-width: 0;
-    margin: 12px 0 10px !important;
-    padding: 8px !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    align-content: start;
-    gap: 9px !important;
-    border: 1px solid #075b36;
-    border-radius: 13px;
-    background: #04090d;
-    box-shadow: 0 0 14px #00d66b18;
-  }
-  .card {
-    min-width: 0;
-    height: clamp(105px, 17vh, 145px) !important;
-    border-radius: 12px !important;
-  }
-  .circle {
-    width: clamp(56px, 8vh, 78px) !important;
-    height: clamp(56px, 8vh, 78px) !important;
-  }
-  .label {
-    left: 4px !important;
-    right: 4px !important;
-    bottom: 4px !important;
-    font-size: clamp(9px, 1.1vw, 12px) !important;
-  }
-  .site-footer {
-    grid-area: footer !important;
-    width: calc(100% + 24px);
-    margin-left: -12px;
-    padding: 10px 12px 14px;
-  }
-  /* If the player was left in CSS-fullscreen mode by a rotation, restore page layout.
-     True browser fullscreen remains controlled by the browser fullscreen pseudo-class. */
-  #vipVideoBox.vip-css-fullscreen {
-    position: relative !important;
-    inset: auto !important;
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    transform: none !important;
-    z-index: auto !important;
-  }
-  #vipVideoBox.vip-css-fullscreen > #video,
-  #vipVideoBox.vip-css-fullscreen > .welcome-video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-  }
-}
-@media (min-width: 1200px) and (orientation: landscape) {
-  body {
-    grid-template-columns: minmax(0, 1.6fr) minmax(390px, 1fr);
-    column-gap: 16px;
-    padding: 0 18px;
-  }
-  #grid, .grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 10px !important; }
-  .card { height: clamp(120px, 15vh, 170px) !important; }
-}
-@media (orientation: portrait) {
-  body { display: block !important; }
-  .player-section { width: calc(100% - 32px); }
-  #grid, .grid { display: grid; }
-}
 
 
 /* =========================================================
-   MsM.Tv Desktop Mode V4
-   Structural layout: left player/controls, right scrollable channels.
-   Portrait normal mode remains the original single-column mobile UI.
+   MsM.Tv DESKTOP MODE — FINAL STRUCTURED LAYOUT
+   Reference: header + categories fixed, player/notice left,
+   search fixed at right, only channel grid scrolls.
+   Mobile portrait remains the original flow and dimensions.
    ========================================================= */
 
-/* On normal/mobile view wrappers do not alter document flow. */
-.desktop-layout, .desktop-left, .desktop-right { display: contents; }
-
+/* Desktop / browser "Desktop site" viewport */
 @media screen and (min-width: 650px) {
   html, body {
     width:100% !important;
-    min-height:100% !important;
+    height:100% !important;
+    min-height:0 !important;
     margin:0 !important;
     overflow:hidden !important;
+    overscroll-behavior:none !important;
     background:#03070b !important;
   }
   body {
     display:flex !important;
     flex-direction:column !important;
-    height:100vh !important;
-    height:100dvh !important;
+    align-items:stretch !important;
+    box-sizing:border-box !important;
   }
   body > .header {
-    flex:0 0 64px !important;
-    width:100% !important;
-    height:64px !important;
-    min-height:64px !important;
+    order:1 !important;
     position:relative !important;
-    top:auto !important;
-    z-index:30 !important;
-    padding:0 18px !important;
-  }
-  .desktop-layout {
-    display:grid !important;
-    grid-template-columns:minmax(0, 1.55fr) minmax(320px, 1fr) !important;
-    gap:12px !important;
+    inset:auto !important;
+    flex:0 0 76px !important;
     width:100% !important;
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    padding:10px 12px 12px !important;
+    height:76px !important;
+    min-height:76px !important;
+    margin:0 !important;
+    padding:0 24px !important;
+    z-index:50 !important;
+  }
+  body > #cats.cats {
+    order:2 !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 62px !important;
+    width:100% !important;
+    height:62px !important;
+    min-height:62px !important;
+    margin:0 !important;
+    padding:7px 18px !important;
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:14px !important;
     overflow:hidden !important;
+    background:#03070b !important;
+    border-bottom:1px solid #102b25 !important;
+    z-index:40 !important;
+  }
+  body > #cats.cats button {
+    flex:0 0 auto !important;
+    min-width:112px !important;
+    height:44px !important;
+    padding:0 18px !important;
+    font-size:15px !important;
+  }
+  body > .desktop-layout {
+    order:3 !important;
+    display:grid !important;
+    grid-template-columns:minmax(0, 2.05fr) minmax(360px, 0.95fr) !important;
+    grid-template-rows:minmax(0,1fr) !important;
+    gap:14px !important;
+    width:100% !important;
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:10px 14px 12px !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
     align-items:stretch !important;
   }
-  .desktop-left {
+  body > .desktop-layout > .desktop-left {
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  body > .desktop-layout > .desktop-right {
     display:flex !important;
     flex-direction:column !important;
     align-items:stretch !important;
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    height:100% !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    scrollbar-width:thin;
-    scrollbar-color:#146b4b #071016;
-  }
-  .desktop-right {
-    display:block !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    height:100% !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-    overscroll-behavior:contain;
-    scrollbar-width:thin;
-    scrollbar-color:#146b4b #071016;
-    border:1px solid #123c31 !important;
-    border-radius:15px !important;
-    padding:8px !important;
+    margin:0 !important;
+    padding:9px !important;
+    gap:9px !important;
+    overflow:hidden !important;
+    overscroll-behavior:contain !important;
+    border:1px solid #075b36 !important;
+    border-radius:16px !important;
     background:linear-gradient(160deg,#050d12,#03080c) !important;
+    box-sizing:border-box !important;
   }
 
-  /* Critical: cancel accumulated V8–V12 fixed/sticky player overrides. */
-  .desktop-left > #playerSection.player-section {
+  /* Left column: player and notice are fixed in the viewport. */
+  body > .desktop-layout .desktop-left > #playerSection {
     display:block !important;
-    position:sticky !important;
-    top:0 !important;
+    position:relative !important;
     inset:auto !important;
+    top:auto !important;
     left:auto !important;
     right:auto !important;
     bottom:auto !important;
-    align-self:start !important;
     float:none !important;
     transform:none !important;
     flex:0 0 auto !important;
@@ -4043,20 +3939,23 @@ video{
     height:auto !important;
     min-height:0 !important;
     max-height:none !important;
-    margin:0 0 8px 0 !important;
+    margin:0 0 10px 0 !important;
     padding:7px !important;
-    border:2px solid #e00000 !important;
-    border-right-color:#00c853 !important;
-    border-radius:13px !important;
-    background:#05090d !important;
-    box-shadow:0 0 14px #00c85322,0 0 12px #e0000022 !important;
+    box-sizing:border-box !important;
+    border:2px solid transparent !important;
+    border-radius:15px !important;
+    background:
+      linear-gradient(#05090d,#05090d) padding-box,
+      linear-gradient(110deg,#ff1838,#e7a12c,#00e86a) border-box !important;
+    box-shadow:0 0 15px #00b86b20,0 0 12px #ff193322 !important;
+    overflow:hidden !important;
     z-index:2 !important;
   }
-  .desktop-left > #playerSection .player-head {
+  body > .desktop-layout .desktop-left > #playerSection .player-head {
     display:none !important;
   }
-  .desktop-left > #playerSection #vipVideoBox,
-  .desktop-left > #playerSection .video-box {
+  body > .desktop-layout .desktop-left > #playerSection #vipVideoBox,
+  body > .desktop-layout .desktop-left > #playerSection .video-box {
     display:block !important;
     position:relative !important;
     inset:auto !important;
@@ -4066,134 +3965,153 @@ video{
     min-height:0 !important;
     max-height:none !important;
     aspect-ratio:16 / 9 !important;
-    border-radius:9px !important;
     overflow:hidden !important;
+    border-radius:9px !important;
   }
-  .desktop-left > #playerSection #video,
-  .desktop-left > #playerSection .welcome-video {
+  body > .desktop-layout .desktop-left > #playerSection #video,
+  body > .desktop-layout .desktop-left > #playerSection .welcome-video {
     position:absolute !important;
     inset:0 !important;
-    display:block !important;
     width:100% !important;
     height:100% !important;
     object-fit:contain !important;
   }
-  .desktop-left > #playerSpacer.player-spacer {
+  body > .desktop-layout .desktop-left > #playerSpacer {
     display:none !important;
-    width:0 !important;
-    height:0 !important;
   }
-  .desktop-left > .headline {
+  body > .desktop-layout .desktop-left > .headline {
     display:flex !important;
     position:relative !important;
     inset:auto !important;
-    top:auto !important;
-    flex:0 0 auto !important;
+    flex:0 0 48px !important;
     width:100% !important;
-    height:36px !important;
-    margin:0 0 8px 0 !important;
-    z-index:1 !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+    z-index:2 !important;
   }
-  .desktop-left > .channel-search-wrap {
-    display:block !important;
-    position:relative !important;
-    width:100% !important;
-    flex:0 0 auto !important;
-    margin:0 0 8px 0 !important;
-  }
-  .desktop-left > .cats {
-    display:flex !important;
-    position:relative !important;
-    inset:auto !important;
-    top:auto !important;
-    flex:0 0 auto !important;
-    flex-wrap:wrap !important;
-    justify-content:flex-start !important;
-    gap:7px !important;
-    width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none !important;
-    overflow:visible !important;
-    padding:7px 0 9px !important;
-    margin:0 0 7px 0 !important;
-  }
-  .desktop-left > .cats button {
-    flex:0 1 auto !important;
-    min-width:0 !important;
-    height:36px !important;
-    padding:0 12px 0 30px !important;
-    font-size:clamp(10px,1.1vw,14px) !important;
-  }
-  .desktop-left > .blue-line {
-    flex:0 0 4px !important;
-    width:42% !important;
-    margin:0 0 8px 0 !important;
+  body > .desktop-layout .desktop-left > .blue-line {
+    display:none !important;
   }
 
-  /* Channel list owns its own scroll; footer stays after all channel cards. */
-  .desktop-right > #grid.grid {
+  /* Right column: search is static; ONLY #grid gets a scrollbar. */
+  body > .desktop-layout .desktop-right > .channel-search-wrap {
+    display:flex !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 48px !important;
+    width:100% !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+    z-index:5 !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid {
     display:grid !important;
     position:relative !important;
     inset:auto !important;
     transform:none !important;
+    flex:1 1 0 !important;
     width:100% !important;
-    height:auto !important;
+    height:0 !important;
     min-height:0 !important;
     max-height:none !important;
     margin:0 !important;
-    padding:0 0 12px !important;
+    padding:0 2px 12px !important;
     grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    grid-auto-rows:auto !important;
+    grid-auto-rows:max-content !important;
     align-content:start !important;
-    gap:9px !important;
-    overflow:visible !important;
+    align-items:stretch !important;
+    gap:10px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#146b4b #071016 !important;
     border:0 !important;
     background:transparent !important;
+    box-sizing:border-box !important;
+    z-index:2 !important;
   }
-  .desktop-right > #grid .card {
-    width:100% !important;
-    height:clamp(108px,16vh,155px) !important;
-    min-width:0 !important;
-    margin:0 !important;
+  body > .desktop-layout .desktop-right > #grid.grid::-webkit-scrollbar {
+    width:6px !important;
   }
-  .desktop-right > #grid .circle {
-    width:clamp(54px,7vh,82px) !important;
-    height:clamp(54px,7vh,82px) !important;
+  body > .desktop-layout .desktop-right > #grid.grid::-webkit-scrollbar-thumb {
+    background:#146b4b !important;
+    border-radius:8px !important;
   }
-  .desktop-right > #grid .label {
-    left:3px !important;
-    right:3px !important;
-    bottom:3px !important;
-    font-size:clamp(9px,.9vw,12px) !important;
-  }
-  .desktop-right > #empty {
-    display:block;
-    text-align:center;
-  }
-  .desktop-right > .site-footer {
-    display:block !important;
+  body > .desktop-layout .desktop-right > #grid .card {
     position:relative !important;
     width:100% !important;
-    margin:8px 0 0 !important;
-    padding:12px 6px 18px !important;
-    border-top:1px solid #123c31;
+    height:clamp(118px,17vh,168px) !important;
+    min-width:0 !important;
+    margin:0 !important;
+    border-radius:13px !important;
   }
-}
-@media screen and (min-width:1200px) {
-  .desktop-layout {
-    grid-template-columns:minmax(0,1.6fr) minmax(400px,1fr) !important;
-    gap:16px !important;
+  body > .desktop-layout .desktop-right > #grid .circle {
+    width:clamp(58px,7vw,92px) !important;
+    height:clamp(58px,7vw,92px) !important;
   }
-  .desktop-right > #grid.grid {
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  body > .desktop-layout .desktop-right > #grid .label {
+    left:4px !important;
+    right:4px !important;
+    bottom:4px !important;
+    font-size:clamp(10px,.9vw,13px) !important;
   }
-  .desktop-right > #grid .card { height:clamp(120px,15vh,170px) !important; }
+  body > .desktop-layout .desktop-right > #empty {
+    display:none !important;
+  }
+  body > .desktop-layout .desktop-right > .site-footer {
+    display:block !important;
+    position:relative !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:6px 4px 2px !important;
+    text-align:center !important;
+    font-size:10px !important;
+    border-top:1px solid #123c31 !important;
+  }
 }
 
-/* In ordinary portrait mobile mode, preserve the original one-column flow. */
+/* Wide desktop: slightly wider player and four channel cards per row. */
+@media screen and (min-width:1200px) {
+  body > .desktop-layout {
+    grid-template-columns:minmax(0,2.05fr) minmax(420px,.95fr) !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+/* Portrait mobile: retain the original mobile positioning and scrolling. */
 @media screen and (max-width:649px) {
-  html, body { overflow-x:hidden !important; overflow-y:auto !important; }
-  body { display:block !important; height:auto !important; min-height:100vh !important; }
-  .desktop-layout, .desktop-left, .desktop-right { display:contents !important; }
+  html, body {
+    width:100% !important;
+    height:auto !important;
+    min-height:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  body {
+    display:block !important;
+    min-height:100vh !important;
+  }
+  body > .header {
+    width:100% !important;
+  }
+  body > #cats.cats {
+    /* Existing mobile CSS positions the category strip below search. */
+    position:fixed !important;
+  }
+  .desktop-layout, .desktop-left, .desktop-right {
+    display:contents !important;
+  }
+  .desktop-left > #playerSection {
+    position:fixed !important;
+  }
+  .desktop-right > #grid.grid {
+    position:fixed !important;
+  }
 }
