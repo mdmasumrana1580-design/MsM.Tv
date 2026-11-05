@@ -4115,3 +4115,351 @@ video{
     position:fixed !important;
   }
 }
+
+
+/* ============================================================
+   MsM.Tv DESKTOP MODE — REFERENCE LAYOUT FINAL OVERRIDE (V5)
+   Keep the whole shell fixed in the viewport. Only #grid scrolls.
+   Activated by a wide CSS viewport (Chrome "Desktop site"), not
+   by device orientation. The existing narrow mobile UI is untouched.
+   ============================================================ */
+@media screen and (min-width: 650px) {
+  :root {
+    --msm-desktop-header-h: 76px;
+    --msm-desktop-cats-h: 62px;
+    --msm-desktop-notice-h: 48px;
+    --msm-desktop-gap: 12px;
+  }
+
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    background: #03070b !important;
+  }
+
+  body {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    box-sizing: border-box !important;
+  }
+
+  body > .header {
+    order: 1 !important;
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 var(--msm-desktop-header-h) !important;
+    width: 100% !important;
+    height: var(--msm-desktop-header-h) !important;
+    min-height: var(--msm-desktop-header-h) !important;
+    max-height: var(--msm-desktop-header-h) !important;
+    margin: 0 !important;
+    padding: 0 22px !important;
+    box-sizing: border-box !important;
+    z-index: 100 !important;
+  }
+
+  body > #cats.cats {
+    order: 2 !important;
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 var(--msm-desktop-cats-h) !important;
+    width: 100% !important;
+    height: var(--msm-desktop-cats-h) !important;
+    min-height: var(--msm-desktop-cats-h) !important;
+    max-height: var(--msm-desktop-cats-h) !important;
+    margin: 0 !important;
+    padding: 7px 18px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: clamp(8px, 1.1vw, 16px) !important;
+    overflow: hidden !important;
+    background: #03070b !important;
+    border-bottom: 1px solid #102b25 !important;
+    z-index: 90 !important;
+  }
+
+  body > #cats.cats button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: clamp(92px, 10vw, 150px) !important;
+    height: 44px !important;
+    margin: 0 !important;
+    padding: 0 17px !important;
+    font-size: clamp(13px, 1.05vw, 17px) !important;
+    white-space: nowrap !important;
+  }
+
+  body > .desktop-layout {
+    order: 3 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 2.05fr) minmax(270px, .95fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+    gap: var(--msm-desktop-gap) !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 12px 14px 14px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    align-items: stretch !important;
+  }
+
+  body > .desktop-layout > .desktop-left {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSection {
+    display: flex !important;
+    flex: 1 1 0 !important;
+    flex-direction: column !important;
+    position: relative !important;
+    inset: auto !important;
+    float: none !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 0 9px 0 !important;
+    padding: 7px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border: 2px solid transparent !important;
+    border-radius: 16px !important;
+    background:
+      linear-gradient(#05090d,#05090d) padding-box,
+      linear-gradient(110deg,#ed142e,#e6a02c,#00df68) border-box !important;
+    box-shadow: 0 0 16px #00b86b20, 0 0 13px #ff193322 !important;
+    z-index: 2 !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSection .player-head {
+    display: none !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSection .video-box,
+  body > .desktop-layout > .desktop-left > #playerSection #vipVideoBox {
+    display: block !important;
+    position: relative !important;
+    inset: auto !important;
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSection #video,
+  body > .desktop-layout > .desktop-left > #playerSection .welcome-video {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSpacer {
+    display: none !important;
+    flex: 0 0 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  body > .desktop-layout > .desktop-left > .headline {
+    display: flex !important;
+    flex: 0 0 var(--msm-desktop-notice-h) !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: var(--msm-desktop-notice-h) !important;
+    min-height: var(--msm-desktop-notice-h) !important;
+    max-height: var(--msm-desktop-notice-h) !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    z-index: 3 !important;
+  }
+
+  body > .desktop-layout > .desktop-left > .blue-line {
+    display: none !important;
+  }
+
+  body > .desktop-layout > .desktop-right {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 9px !important;
+    gap: 9px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    border: 1px solid #075b36 !important;
+    border-radius: 17px !important;
+    background: linear-gradient(160deg,#050d12,#03080c) !important;
+  }
+
+  body > .desktop-layout > .desktop-right > .channel-search-wrap {
+    display: flex !important;
+    flex: 0 0 48px !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    z-index: 5 !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid.grid {
+    display: grid !important;
+    flex: 1 1 0 !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 2px 2px 12px !important;
+    box-sizing: border-box !important;
+    grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+    grid-auto-rows: max-content !important;
+    align-content: start !important;
+    align-items: stretch !important;
+    gap: 9px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #146b4b #071016 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid.grid::-webkit-scrollbar {
+    width: 6px !important;
+  }
+  body > .desktop-layout > .desktop-right > #grid.grid::-webkit-scrollbar-thumb {
+    background: #146b4b !important;
+    border-radius: 8px !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .card {
+    position: relative !important;
+    width: 100% !important;
+    height: clamp(112px, 18vh, 164px) !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    border-radius: 13px !important;
+    box-sizing: border-box !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .circle {
+    width: clamp(56px, 6.8vw, 92px) !important;
+    height: clamp(56px, 6.8vw, 92px) !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .label {
+    left: 4px !important;
+    right: 4px !important;
+    bottom: 4px !important;
+    font-size: clamp(10px, .92vw, 14px) !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #empty {
+    display: none !important;
+  }
+
+  body > .desktop-layout > .desktop-right > .site-footer {
+    display: block !important;
+    flex: 0 0 auto !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 6px 4px 2px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    border-top: 1px solid #123c31 !important;
+  }
+}
+
+/* At smaller desktop-site widths keep the player dominant, as in the reference. */
+@media screen and (min-width:650px) and (max-width:850px) {
+  body > .desktop-layout {
+    grid-template-columns: minmax(0, 1.8fr) minmax(245px, 1fr) !important;
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+  body > .desktop-layout > .desktop-right {
+    padding: 6px !important;
+    gap: 7px !important;
+  }
+  body > .desktop-layout > .desktop-right > #grid.grid {
+    gap: 6px !important;
+  }
+  body > .desktop-layout > .desktop-right > #grid .card {
+    height: clamp(94px, 17vh, 132px) !important;
+  }
+}
+
+/* Ordinary narrow portrait mobile stays on its existing mobile layout. */
+@media screen and (max-width:649px) {
+  html, body {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+}
