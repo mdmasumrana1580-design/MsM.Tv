@@ -4247,254 +4247,109 @@ video{
   }
 }
 
-
-/* ============================================================
-   MsM.Tv — Desktop reference layout (Nov 2026)
-   Desktop only. Mobile rules and existing app behaviour retained.
-   ============================================================ */
-@media screen and (min-width: 650px) {
-  :root { --msm-head-h:76px; --msm-cat-h:64px; --msm-notice-h:58px; }
-  html, body {
-    width:100% !important; height:100% !important; min-height:0 !important;
-    overflow:hidden !important; background:#020604 !important;
-  }
-  body { display:flex !important; flex-direction:column !important; }
-  body > .header {
-    flex:0 0 var(--msm-head-h) !important; height:var(--msm-head-h) !important;
-    min-height:var(--msm-head-h) !important; padding:0 22px !important;
-    background:#020605 !important; border-bottom:1px solid #16452b !important;
-    box-shadow:0 2px 12px #00d45a20 !important;
-  }
-  body > #cats.cats {
-    flex:0 0 var(--msm-cat-h) !important; height:var(--msm-cat-h) !important;
-    min-height:var(--msm-cat-h) !important; width:74% !important;
-    padding:7px 14px !important; gap:12px !important; overflow:hidden !important;
-    background:#020604 !important; border:0 !important;
-  }
-  body > #cats.cats button {
-    min-width:0 !important; height:48px !important; padding:0 20px !important;
-    border:1px solid #00d84c !important; border-radius:22px !important;
-    background:linear-gradient(180deg,#07140c,#020805) !important;
-    color:#fff !important; font-size:17px !important; font-style:normal !important;
-    box-shadow:0 0 8px #00d94a55,inset 0 0 8px #00b83a20 !important;
-  }
-  body > #cats.cats button.active {
-    background:linear-gradient(180deg,#ff3030,#b90000) !important;
-    border-color:#ff2424 !important; box-shadow:0 0 15px #ff171788 !important;
-  }
-  /* Search occupies the right end of the same category/navigation row. */
-  body > .desktop-layout > .desktop-right > .channel-search-wrap {
-    position:fixed !important; top:calc(var(--msm-head-h) + 10px) !important;
-    right:14px !important; width:25.2% !important; height:44px !important;
-    min-height:44px !important; flex:none !important; z-index:80 !important;
-    padding:0 14px !important; border:1px solid #00df4c !important;
-    border-radius:24px !important; background:#020805 !important;
-    box-shadow:0 0 10px #00df4c55,inset 0 0 8px #00a83b20 !important;
-  }
-  body > .desktop-layout > .desktop-right > .channel-search-wrap .channel-search {
-    height:40px !important; line-height:40px !important; font-size:14px !important;
-    background:transparent !important; border:0 !important; color:#fff !important;
-  }
-  body > .desktop-layout {
-    flex:1 1 0 !important; min-height:0 !important;
-    height:auto !important; padding:8px 14px calc(var(--msm-notice-h) + 10px) !important;
-    gap:12px !important;
-    grid-template-columns:minmax(0,2.08fr) minmax(390px,.98fr) !important;
-    grid-template-rows:minmax(0,1fr) !important;
-    overflow:hidden !important;
-  }
-  body > .desktop-layout > .desktop-left {
-    height:100% !important; min-height:0 !important; overflow:hidden !important;
-  }
-  body > .desktop-layout > .desktop-left > #playerSection {
-    flex:1 1 0 !important; min-height:0 !important; height:auto !important;
-    margin:0 !important; padding:5px !important;
-    border:2px solid transparent !important; border-radius:16px !important;
-    background:linear-gradient(#020604,#020604) padding-box,
-      linear-gradient(120deg,#ff2028,#ff3434 35%,#00ef62 75%,#00b84d) border-box !important;
-    box-shadow:0 0 13px #00e45b88,0 0 12px #ff222255 !important;
-  }
-  body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox {
-    flex:1 1 0 !important; min-height:0 !important; height:100% !important;
-    aspect-ratio:auto !important; border:0 !important; border-radius:10px !important;
-  }
-  body > .desktop-layout > .desktop-left > #playerSection #video,
-  body > .desktop-layout > .desktop-left > #playerSection .welcome-video {
-    object-fit:cover !important;
-  }
-  /* The notice ticker spans the full desktop width at the bottom. */
-  body > .desktop-layout > .desktop-left > .headline {
-    position:fixed !important; left:14px !important; right:14px !important;
-    bottom:10px !important; width:auto !important;
-    height:48px !important; min-height:48px !important; max-height:48px !important;
-    padding:0 10px !important; border:1px solid #00d94e !important;
-    border-radius:13px !important; background:#030906 !important;
-    box-shadow:0 0 10px #00dc4e55,inset 0 0 10px #00a83b18 !important;
-    z-index:100 !important;
-  }
-  body > .desktop-layout > .desktop-left > .headline .headline-notice {
-    background:#e60018 !important; border-radius:10px !important;
-    color:#fff !important; font-weight:900 !important;
-  }
-  body > .desktop-layout > .desktop-left > .blue-line { display:none !important; }
-  body > .desktop-layout > .desktop-right {
-    padding:8px !important; gap:8px !important; border:2px solid #087d3b !important;
-    border-radius:16px !important; background:#020805 !important;
-    box-shadow:0 0 12px #00d94a55 !important;
-  }
-  .desktop-channel-heading {
-    display:flex !important; align-items:center !important; justify-content:space-between !important;
-    flex:0 0 46px !important; height:46px !important; min-height:46px !important;
-    padding:0 4px !important; color:#fff !important; font-size:20px !important;
-  }
-  .desktop-channel-heading strong span { color:#00e64e !important; }
-  .desktop-channel-heading button {
-    border:1px solid #00df4c !important; border-radius:20px !important;
-    padding:8px 14px !important; background:#031008 !important; color:#fff !important;
-    font-weight:800 !important; box-shadow:0 0 9px #00d94a55 !important;
-  }
-  body > .desktop-layout > .desktop-right > #grid.grid {
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    grid-auto-rows:max-content !important; gap:8px !important;
-    padding:0 2px 10px !important;
-  }
-  body > .desktop-layout > .desktop-right > #grid .card {
-    height:clamp(112px,16vh,146px) !important; border:1px solid #087b3d !important;
-    border-radius:13px !important; background:linear-gradient(145deg,#07150d,#020604) !important;
-    box-shadow:inset 0 0 10px #00b83c20,0 0 5px #00d94a25 !important;
-  }
-  body > .desktop-layout > .desktop-right > #grid .circle {
-    width:clamp(54px,5.7vw,82px) !important;
-    height:clamp(54px,5.7vw,82px) !important;
-  }
-  body > .desktop-layout > .desktop-right > #grid .label {
-    color:#fff !important; font-size:clamp(10px,.85vw,13px) !important;
-    text-shadow:0 1px 3px #000 !important;
-  }
-  body > .desktop-layout > .desktop-right > .site-footer { display:none !important; }
-  .header-stat { border-radius:22px !important; }
-  .install-app-header { border-color:#ff2424 !important; box-shadow:0 0 12px #ff242477 !important; }
+/* Player settings: scaling and adaptive/manual HLS quality */
+.vip-settings-btn {
+  width: 42px !important;
+  height: 42px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 25px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  text-shadow: 0 0 8px rgba(0,230,118,.55) !important;
+  pointer-events: auto !important;
 }
-@media screen and (min-width:1200px) {
-  body > .desktop-layout { grid-template-columns:minmax(0,2.08fr) minmax(420px,.98fr) !important; }
+.vip-settings-btn:hover,
+.vip-settings-btn[aria-expanded="true"] { color: #00e676 !important; }
+.vip-settings-menu[hidden] { display: none !important; }
+.vip-settings-menu {
+  position: absolute !important;
+  z-index: 90 !important;
+  right: 14px !important;
+  bottom: 68px !important;
+  width: min(330px, calc(100% - 28px)) !important;
+  max-height: min(78%, 520px) !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  border: 1px solid rgba(0,230,118,.72) !important;
+  border-radius: 13px !important;
+  background: rgba(25,24,31,.97) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.72), 0 0 14px rgba(0,230,118,.22) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  padding: 0 12px 12px !important;
+  font-family: inherit !important;
 }
-/* Hide desktop-only channel heading on phones; existing mobile layout remains intact. */
-@media screen and (max-width:649px) {
-  .desktop-channel-heading { display:none !important; }
+.vip-settings-title {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin: 0 -12px 10px !important;
+  padding: 12px 14px !important;
+  background: rgba(15,15,20,.98) !important;
+  border-bottom: 1px solid rgba(255,255,255,.12) !important;
+  font-weight: 800 !important;
+  font-size: 16px !important;
 }
-
-
-
-/* ============================================================
-   MsM.Tv — 100% browser zoom desktop fit + complete channel logos
-   Designed to keep the reference layout usable at normal zoom.
-   ============================================================ */
-@media screen and (min-width: 650px) and (max-width: 1199px) {
-  html, body {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  body > .desktop-layout {
-    grid-template-columns: minmax(0, 2fr) minmax(285px, 1fr) !important;
-    gap: 8px !important;
-    padding: 7px 8px 62px !important;
-  }
-
-  body > #cats.cats {
-    width: 72% !important;
-    gap: 6px !important;
-    padding-left: 8px !important;
-    padding-right: 6px !important;
-  }
-
-  body > #cats.cats button {
-    padding-left: 11px !important;
-    padding-right: 11px !important;
-    font-size: clamp(11px, 1.25vw, 15px) !important;
-  }
-
-  body > .desktop-layout > .desktop-right {
-    padding: 6px !important;
-    gap: 6px !important;
-  }
-
-  body > .desktop-layout > .desktop-right > #grid.grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 5px !important;
-  }
-
-  body > .desktop-layout > .desktop-right > #grid .card {
-    height: clamp(90px, 17vh, 124px) !important;
-  }
-
-  body > .desktop-layout > .desktop-right > #grid .circle {
-    width: clamp(42px, 5.2vw, 62px) !important;
-    height: clamp(42px, 5.2vw, 62px) !important;
-  }
-
-  body > .desktop-layout > .desktop-right > #grid .circle img {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    object-position: center !important;
-  }
-
-  body > .desktop-layout > .desktop-left > #playerSection #video,
-  body > .desktop-layout > .desktop-left > #playerSection .welcome-video {
-    object-fit: contain !important;
-    object-position: center !important;
-  }
+.vip-settings-title button {
+  width: 30px !important;
+  height: 30px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
 }
-
-/* Always show each supplied channel artwork fully, without cropping it. */
-@media screen and (min-width: 650px) {
-  body > .desktop-layout > .desktop-right > #grid .circle {
-    overflow: hidden !important;
-    background: #fff !important;
-  }
-  body > .desktop-layout > .desktop-right > #grid .circle img {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    object-position: center !important;
-  }
+.vip-settings-section { padding: 7px 0 10px !important; }
+.vip-settings-section + .vip-settings-section { border-top: 1px solid rgba(255,255,255,.14) !important; }
+.vip-settings-label {
+  margin: 0 0 8px !important;
+  color: #00e676 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: .2px !important;
 }
-
-/* MsM.Tv player: fill the complete player frame without cropping any video content.
-   When source and player aspect ratios differ, the video is proportionally stretched
-   to the frame (rather than cropped or letterboxed), as requested. */
-@media screen and (min-width: 650px) {
-  #vipVideoBox > #video,
-  #vipVideoBox > .welcome-video,
-  #vipVideoBox .plyr video,
-  .video-box > #video,
-  .video-box > .welcome-video {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    max-height: none !important;
-    object-fit: fill !important;
-    object-position: center center !important;
-  }
+.vip-settings-options {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 6px !important;
 }
-
-#vipVideoBox:fullscreen > #video,
-#vipVideoBox:-webkit-full-screen > #video,
-#vipVideoBox:fullscreen > .welcome-video,
-#vipVideoBox:-webkit-full-screen > .welcome-video,
-.video-box.vip-fullscreen > #video,
-.video-box.is-fullscreen > #video,
-.video-box.vip-css-fullscreen > #video,
-.video-box.vip-fullscreen > .welcome-video,
-.video-box.is-fullscreen > .welcome-video,
-.video-box.vip-css-fullscreen > .welcome-video {
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: fill !important;
-  object-position: center center !important;
+.vip-settings-options button {
+  min-height: 35px !important;
+  padding: 7px 9px !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,.06) !important;
+  color: #f4f4f4 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+.vip-settings-options button.selected {
+  border-color: #00e676 !important;
+  background: rgba(0,230,118,.18) !important;
+  color: #fff !important;
+  box-shadow: inset 0 0 0 1px rgba(0,230,118,.22), 0 0 8px rgba(0,230,118,.12) !important;
+}
+.vip-settings-options button:active { transform: scale(.97) !important; }
+.quality-options { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+.vip-quality-status {
+  margin-top: 8px !important;
+  color: rgba(255,255,255,.75) !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+#vipVideoBox:fullscreen .vip-settings-menu,
+#vipVideoBox:-webkit-full-screen .vip-settings-menu { right: 22px !important; bottom: 78px !important; }
+@media (max-width: 600px) {
+  .vip-settings-btn { width: 38px !important; height: 38px !important; font-size: 23px !important; }
+  .vip-settings-menu { right: 8px !important; bottom: 58px !important; width: min(310px, calc(100% - 16px)) !important; max-height: 76% !important; }
+  #vipVideoBox:fullscreen .vip-settings-menu,
+  #vipVideoBox:-webkit-full-screen .vip-settings-menu { right: 10px !important; bottom: 65px !important; }
 }
