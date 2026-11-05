@@ -4353,3 +4353,27 @@ video{
   #vipVideoBox:fullscreen .vip-settings-menu,
   #vipVideoBox:-webkit-full-screen .vip-settings-menu { right: 10px !important; bottom: 65px !important; }
 }
+
+
+/* MsM.Tv: remove player settings UI and keep video in Fill Screen mode */
+#vipSettings, #vipSettingsMenu, .vip-settings-btn, .vip-settings-menu {
+  display: none !important;
+}
+#vipVideoBox,
+.video-box {
+  overflow: hidden !important;
+  background: #000 !important;
+}
+#vipVideoBox > video,
+.video-box > video,
+#vipVideoBox #video,
+#vipVideoBox #welcomeVideo {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  transform: none !important;
+}

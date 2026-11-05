@@ -169,22 +169,24 @@ function updateSettingsSelection(container, attribute, value) {
     btn.setAttribute("aria-pressed", selected ? "true" : "false");
   });
 }
-function applyVideoScaling(mode) {
-  preferredVideoScaling = mode || "fill";
-  try { localStorage.setItem("msmtv-video-scaling", preferredVideoScaling); } catch(e) {}
+function applyVideoScaling() {
+  // Fixed default: Fill screen. No player settings menu is shown.
+  preferredVideoScaling = "fill";
   if (video) {
-    video.style.objectFit = preferredVideoScaling === "fit" || preferredVideoScaling === "original" ? "contain" : "cover";
-    video.style.transform = preferredVideoScaling === "zoom" ? "scale(1.14)" : "none";
-    if (preferredVideoScaling === "4:3") video.style.aspectRatio = "4 / 3";
-    else if (preferredVideoScaling === "16:9") video.style.aspectRatio = "16 / 9";
-    else video.style.aspectRatio = "auto";
+    video.style.objectFit = "cover";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.transform = "none";
+    video.style.aspectRatio = "auto";
   }
   if (welcomeVideo) {
-    welcomeVideo.style.objectFit = preferredVideoScaling === "fit" || preferredVideoScaling === "original" ? "contain" : "cover";
-    welcomeVideo.style.transform = preferredVideoScaling === "zoom" ? "scale(1.14)" : "none";
+    welcomeVideo.style.objectFit = "cover";
+    welcomeVideo.style.width = "100%";
+    welcomeVideo.style.height = "100%";
+    welcomeVideo.style.transform = "none";
   }
-  updateSettingsSelection(vipScalingOptions, "data-scaling", preferredVideoScaling);
 }
+
 function availableHlsLevel(targetHeight) {
   if (!hls || !Array.isArray(hls.levels) || !hls.levels.length) return -1;
   const candidates = hls.levels.map(function(level, index) {
