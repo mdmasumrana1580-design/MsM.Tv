@@ -4462,3 +4462,39 @@ video{
     object-position: center !important;
   }
 }
+
+/* MsM.Tv player: fill the complete player frame without cropping any video content.
+   When source and player aspect ratios differ, the video is proportionally stretched
+   to the frame (rather than cropped or letterboxed), as requested. */
+@media screen and (min-width: 650px) {
+  #vipVideoBox > #video,
+  #vipVideoBox > .welcome-video,
+  #vipVideoBox .plyr video,
+  .video-box > #video,
+  .video-box > .welcome-video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: fill !important;
+    object-position: center center !important;
+  }
+}
+
+#vipVideoBox:fullscreen > #video,
+#vipVideoBox:-webkit-full-screen > #video,
+#vipVideoBox:fullscreen > .welcome-video,
+#vipVideoBox:-webkit-full-screen > .welcome-video,
+.video-box.vip-fullscreen > #video,
+.video-box.is-fullscreen > #video,
+.video-box.vip-css-fullscreen > #video,
+.video-box.vip-fullscreen > .welcome-video,
+.video-box.is-fullscreen > .welcome-video,
+.video-box.vip-css-fullscreen > .welcome-video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: fill !important;
+  object-position: center center !important;
+}
