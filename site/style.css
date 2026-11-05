@@ -4382,3 +4382,83 @@ video{
 @media screen and (max-width:649px) {
   .desktop-channel-heading { display:none !important; }
 }
+
+
+
+/* ============================================================
+   MsM.Tv — 100% browser zoom desktop fit + complete channel logos
+   Designed to keep the reference layout usable at normal zoom.
+   ============================================================ */
+@media screen and (min-width: 650px) and (max-width: 1199px) {
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  body > .desktop-layout {
+    grid-template-columns: minmax(0, 2fr) minmax(285px, 1fr) !important;
+    gap: 8px !important;
+    padding: 7px 8px 62px !important;
+  }
+
+  body > #cats.cats {
+    width: 72% !important;
+    gap: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 6px !important;
+  }
+
+  body > #cats.cats button {
+    padding-left: 11px !important;
+    padding-right: 11px !important;
+    font-size: clamp(11px, 1.25vw, 15px) !important;
+  }
+
+  body > .desktop-layout > .desktop-right {
+    padding: 6px !important;
+    gap: 6px !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid.grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .card {
+    height: clamp(90px, 17vh, 124px) !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .circle {
+    width: clamp(42px, 5.2vw, 62px) !important;
+    height: clamp(42px, 5.2vw, 62px) !important;
+  }
+
+  body > .desktop-layout > .desktop-right > #grid .circle img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+
+  body > .desktop-layout > .desktop-left > #playerSection #video,
+  body > .desktop-layout > .desktop-left > #playerSection .welcome-video {
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
+
+/* Always show each supplied channel artwork fully, without cropping it. */
+@media screen and (min-width: 650px) {
+  body > .desktop-layout > .desktop-right > #grid .circle {
+    overflow: hidden !important;
+    background: #fff !important;
+  }
+  body > .desktop-layout > .desktop-right > #grid .circle img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
