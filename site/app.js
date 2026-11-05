@@ -345,6 +345,8 @@ function ensureRgbLoadMoreStyle() {
 }
 
 function render() {
+  const desktopCount = document.getElementById("desktopChannelCount");
+  if (desktopCount) desktopCount.textContent = "(" + channels.length.toLocaleString("en-US") + ")";
   ensureRgbLoadMoreStyle();
   const q = channelSearch ? channelSearch.value.trim().toLocaleLowerCase() : "";
   grid.innerHTML = "";
@@ -726,6 +728,20 @@ if (channelSearch) {
   channelSearch.addEventListener("input", function () {
     currentChannelIndex = -1;
     render();
+  });
+}
+
+const desktopViewAll = document.getElementById("desktopViewAll");
+if (desktopViewAll) {
+  desktopViewAll.addEventListener("click", function () {
+    if (channelSearch) channelSearch.value = "";
+    current = "ALL";
+    document.querySelectorAll("#cats [data-cat]").forEach(function (button) {
+      button.classList.toggle("active", normalizeCategoryKey(button.dataset.cat) === "ALL");
+    });
+    catalogueRenderLimit = CATALOGUE_PAGE_SIZE;
+    render();
+    if (grid) grid.scrollTop = 0;
   });
 }
 
