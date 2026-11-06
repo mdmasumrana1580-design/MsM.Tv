@@ -4378,8 +4378,12 @@ video{
   transform: none !important;
 }
 
-/* MsM.Tv fullscreen: stretch video to fill the complete phone viewport.
-   This intentionally changes aspect ratio slightly to remove all black bars. */
+/* ==========================================================
+   FIX v2: Fullscreen video is wrapped by Plyr at runtime.
+   Earlier rules targeted the video directly, while the Plyr
+   wrapper kept a 16:9 width and caused black side pillars.
+   Expand every layer to the fullscreen viewport.
+   ========================================================== */
 html body #vipVideoBox:fullscreen,
 html body #vipVideoBox:-webkit-full-screen,
 html body #vipVideoBox.vip-fullscreen,
@@ -4404,13 +4408,19 @@ html body #vipVideoBox.vip-css-fullscreen {
   border-radius: 0 !important;
   overflow: hidden !important;
   background: #000 !important;
-  z-index: 2147483647 !important;
 }
-html body #vipVideoBox:fullscreen > video,
-html body #vipVideoBox:-webkit-full-screen > video,
-html body #vipVideoBox.vip-fullscreen > video,
-html body #vipVideoBox.is-fullscreen > video,
-html body #vipVideoBox.vip-css-fullscreen > video {
+
+/* Plyr's outer element and video viewport must not retain 16:9 sizing. */
+html body #vipVideoBox:fullscreen > .plyr,
+html body #vipVideoBox:-webkit-full-screen > .plyr,
+html body #vipVideoBox.vip-fullscreen > .plyr,
+html body #vipVideoBox.is-fullscreen > .plyr,
+html body #vipVideoBox.vip-css-fullscreen > .plyr,
+html body #vipVideoBox:fullscreen .plyr__video-wrapper,
+html body #vipVideoBox:-webkit-full-screen .plyr__video-wrapper,
+html body #vipVideoBox.vip-fullscreen .plyr__video-wrapper,
+html body #vipVideoBox.is-fullscreen .plyr__video-wrapper,
+html body #vipVideoBox.vip-css-fullscreen .plyr__video-wrapper {
   position: absolute !important;
   inset: 0 !important;
   display: block !important;
@@ -4421,6 +4431,32 @@ html body #vipVideoBox.vip-css-fullscreen > video {
   min-height: 100% !important;
   max-width: none !important;
   max-height: none !important;
+  aspect-ratio: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  transform: none !important;
+  background: #000 !important;
+}
+
+/* Target the actual media node inside Plyr as well as direct video nodes. */
+html body #vipVideoBox:fullscreen video,
+html body #vipVideoBox:-webkit-full-screen video,
+html body #vipVideoBox.vip-fullscreen video,
+html body #vipVideoBox.is-fullscreen video,
+html body #vipVideoBox.vip-css-fullscreen video {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -4429,4 +4465,15 @@ html body #vipVideoBox.vip-css-fullscreen > video {
   object-position: center center !important;
   transform: none !important;
   background: #000 !important;
+}
+
+/* Prevent Plyr's intrinsic aspect-ratio pseudo spacer from shrinking it. */
+html body #vipVideoBox:fullscreen .plyr__video-wrapper::before,
+html body #vipVideoBox:-webkit-full-screen .plyr__video-wrapper::before,
+html body #vipVideoBox.vip-fullscreen .plyr__video-wrapper::before,
+html body #vipVideoBox.is-fullscreen .plyr__video-wrapper::before,
+html body #vipVideoBox.vip-css-fullscreen .plyr__video-wrapper::before {
+  display: none !important;
+  padding-bottom: 0 !important;
+  content: none !important;
 }
