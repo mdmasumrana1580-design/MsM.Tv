@@ -4377,3 +4377,74 @@ video{
   object-position: center center !important;
   transform: none !important;
 }
+
+/* =========================================================
+   MsM.Tv — FINAL FULLSCREEN FILL FIX
+   Keep the picture covering the whole screen in portrait or
+   landscape fullscreen. Crop excess edges; never stretch.
+   ========================================================= */
+#vipVideoBox:fullscreen,
+#vipVideoBox:-webkit-full-screen,
+#vipVideoBox.vip-fullscreen,
+#vipVideoBox.is-fullscreen,
+#vipVideoBox.vip-css-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  z-index: 2147483647 !important;
+}
+
+#vipVideoBox:fullscreen > #video,
+#vipVideoBox:-webkit-full-screen > #video,
+#vipVideoBox.vip-fullscreen > #video,
+#vipVideoBox.is-fullscreen > #video,
+#vipVideoBox.vip-css-fullscreen > #video {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  transform: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* The welcome/intro video follows the same fullscreen geometry. */
+#vipVideoBox:fullscreen > .welcome-video,
+#vipVideoBox:-webkit-full-screen > .welcome-video,
+#vipVideoBox.vip-fullscreen > .welcome-video,
+#vipVideoBox.is-fullscreen > .welcome-video,
+#vipVideoBox.vip-css-fullscreen > .welcome-video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
