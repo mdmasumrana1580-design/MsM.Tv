@@ -4405,3 +4405,110 @@ video{
   border-radius:0 !important;
   box-shadow:none !important;
 }
+
+/* ==========================================================
+   MsM.Tv final player layout: thicker red/green frame and
+   true fullscreen fill. Fullscreen stretches the entire video
+   into the viewport (no black bars and no crop).
+   ========================================================== */
+#vipVideoBox.video-box{
+  box-sizing:border-box !important;
+  border:5px solid transparent !important;
+  border-radius:14px !important;
+  background:
+    linear-gradient(#000,#000) padding-box,
+    linear-gradient(115deg,#ed152e 0%,#ff3548 32%,#13d875 70%,#00a84f 100%) border-box !important;
+  box-shadow:0 0 0 1px rgba(255,25,55,.25),
+             0 0 16px rgba(0,190,90,.25),
+             0 0 16px rgba(235,20,45,.20) !important;
+  overflow:hidden !important;
+}
+#vipVideoBox.video-box > video{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:fill !important;
+  object-position:center center !important;
+}
+#vipVideoBox.video-box.welcome-active #video{
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+#vipVideoBox.video-box.welcome-active #welcomeVideo{
+  visibility:visible !important;
+  opacity:1 !important;
+}
+#vipVideoBox.video-box:not(.welcome-active) #welcomeVideo,
+#vipVideoBox.video-box .welcome-video.welcome-hidden{
+  display:none !important;
+}
+
+/* Native browser fullscreen and CSS fallback use identical sizing. */
+#vipVideoBox:fullscreen,
+#vipVideoBox:-webkit-full-screen,
+#vipVideoBox.vip-fullscreen,
+#vipVideoBox.is-fullscreen,
+#vipVideoBox.vip-css-fullscreen{
+  position:fixed !important;
+  inset:0 !important;
+  display:block !important;
+  box-sizing:border-box !important;
+  width:100vw !important;
+  height:100vh !important;
+  height:100dvh !important;
+  min-width:100vw !important;
+  min-height:100vh !important;
+  min-height:100dvh !important;
+  max-width:none !important;
+  max-height:none !important;
+  aspect-ratio:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  overflow:hidden !important;
+  background:#000 !important;
+  box-shadow:none !important;
+  z-index:2147483647 !important;
+}
+#vipVideoBox:fullscreen > video,
+#vipVideoBox:-webkit-full-screen > video,
+#vipVideoBox.vip-fullscreen > video,
+#vipVideoBox.is-fullscreen > video,
+#vipVideoBox.vip-css-fullscreen > video{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  box-sizing:border-box !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  object-fit:fill !important;
+  object-position:center center !important;
+  transform:none !important;
+  background:#000 !important;
+}
+#vipVideoBox:fullscreen #welcomeVideo.welcome-hidden,
+#vipVideoBox:-webkit-full-screen #welcomeVideo.welcome-hidden,
+#vipVideoBox.vip-fullscreen #welcomeVideo.welcome-hidden,
+#vipVideoBox.is-fullscreen #welcomeVideo.welcome-hidden,
+#vipVideoBox.vip-css-fullscreen #welcomeVideo.welcome-hidden{
+  display:none !important;
+}
+#vipVideoBox:fullscreen .live-badge,
+#vipVideoBox:-webkit-full-screen .live-badge,
+#vipVideoBox.vip-fullscreen .live-badge,
+#vipVideoBox.is-fullscreen .live-badge,
+#vipVideoBox.vip-css-fullscreen .live-badge{
+  z-index:2147483647 !important;
+}
+@media(max-width:700px){
+  #vipVideoBox.video-box{border-width:5px !important;border-radius:12px !important;}
+}

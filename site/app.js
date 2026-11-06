@@ -137,7 +137,7 @@ async function initVisitorCounter() {
   };
 
   refreshOnline();
-  setInterval(refreshOnline, 20000);
+  setInterval(refreshOnline, 15 * 60 * 1000);
 }
 
 initVisitorCounter();
@@ -173,14 +173,14 @@ function applyVideoScaling() {
   // Fixed default: Fill screen. No player settings menu is shown.
   preferredVideoScaling = "fill";
   if (video) {
-    video.style.objectFit = "cover";
+    video.style.objectFit = "fill";
     video.style.width = "100%";
     video.style.height = "100%";
     video.style.transform = "none";
     video.style.aspectRatio = "auto";
   }
   if (welcomeVideo) {
-    welcomeVideo.style.objectFit = "cover";
+    welcomeVideo.style.objectFit = "fill";
     welcomeVideo.style.width = "100%";
     welcomeVideo.style.height = "100%";
     welcomeVideo.style.transform = "none";

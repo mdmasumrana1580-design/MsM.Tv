@@ -137,44 +137,62 @@
      Do not redirect channel-card clicks to payment.html; this site has no public
      payment gateway page. Device blocking and registration checks remain enabled. */
 
+  let checkingDevice = false;
+  let registrationAttempted = false;
+
   async function checkDevice() {
-    if (blocked) return false;
+    if (blocked || checkingDevice) return false;
+    checkingDevice = true;
     try {
-      const name = localStorage.getItem("vip-network-device-name") ||
-        ((/Mobi|Android/i.test(navigator.userAgent)) ? "Mobile Device" : "Browser Device");
-
-      const reg = await nativeFetch(apiBase() + "/api/device/register", {
-        method:"POST",
-        headers:{"content-type":"application/json","X-ViP-Device-ID":deviceId},
-        body:JSON.stringify({
-          deviceId:deviceId,
-          deviceName:name,
-          userAgent:navigator.userAgent
-        }),
-        cache:"no-store"
-      });
-      const rd = await reg.json().catch(() => ({}));
-
-      if (reg.status === 403 || rd.blocked === true || (rd.device && rd.device.blocked === true)) {
-        showBlocked();
-        return false;
-      }
-
+      // Check status with GET first. This does not write to KV.
       const d = await loadAccess();
+
       if (d && (d.blocked === true ||
         (d.device && d.device.blocked === true) ||
         String(d.device && d.device.status || "").toLowerCase() === "blocked")) {
         showBlocked();
         return false;
       }
+
+      // Register an unknown device once per page load only.
+      // Never POST-register an already registered device on every heartbeat.
+      if (d && !d.device && !registrationAttempted) {
+        registrationAttempted = true;
+        const name = localStorage.getItem("vip-network-device-name") ||
+          ((/Mobi|Android/i.test(navigator.userAgent)) ? "Mobile Device" : "Browser Device");
+        const reg = await nativeFetch(apiBase() + "/api/device/register", {
+          method: "POST",
+          headers: {"content-type":"application/json", "X-ViP-Device-ID":deviceId},
+          body: JSON.stringify({
+            deviceId: deviceId,
+            deviceName: name,
+            userAgent: navigator.userAgent
+          }),
+          cache: "no-store"
+        });
+        const rd = await reg.json().catch(() => ({}));
+        if (reg.status === 403 || rd.blocked === true ||
+            (rd.device && rd.device.blocked === true)) {
+          showBlocked();
+          return false;
+        }
+      }
       return true;
     } catch (e) {
+      console.warn("Device guard check unavailable", e);
       return true;
+    } finally {
+      checkingDevice = false;
     }
   }
 
   checkDevice();
-  setInterval(checkDevice, 10000);
+  // Read-only device status checks; no repeated KV writes.
+  setInterval(checkDevice, 60000);
+  window.addEventListener("focus", checkDevice);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) checkDevice();
+  });
   window.addEventListener("focus", checkDevice);
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) checkDevice();
