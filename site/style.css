@@ -4378,16 +4378,18 @@ video{
   transform: none !important;
 }
 
-/* =========================================================
-   MsM.Tv — FINAL FULLSCREEN FILL FIX
-   Keep the picture covering the whole screen in portrait or
-   landscape fullscreen. Crop excess edges; never stretch.
-   ========================================================= */
-#vipVideoBox:fullscreen,
-#vipVideoBox:-webkit-full-screen,
-#vipVideoBox.vip-fullscreen,
-#vipVideoBox.is-fullscreen,
-#vipVideoBox.vip-css-fullscreen {
+/* ============================================================
+   MsM.Tv FULLSCREEN FIX v2 — override desktop contain rules.
+   The desktop layout uses a high-specificity object-fit:contain
+   rule. These selectors intentionally outrank it in fullscreen.
+   ============================================================ */
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-fullscreen,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.is-fullscreen,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-css-fullscreen,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen {
   position: fixed !important;
   inset: 0 !important;
   display: block !important;
@@ -4404,23 +4406,37 @@ video{
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
+  transform: none !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
   background: #000 !important;
   z-index: 2147483647 !important;
 }
 
-#vipVideoBox:fullscreen > #video,
-#vipVideoBox:-webkit-full-screen > #video,
-#vipVideoBox.vip-fullscreen > #video,
-#vipVideoBox.is-fullscreen > #video,
-#vipVideoBox.vip-css-fullscreen > #video {
+/* Force both live and welcome videos to use the entire fullscreen box. */
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen > #video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen > #video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-fullscreen > #video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.is-fullscreen > #video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-css-fullscreen > #video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen > .welcome-video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen > .welcome-video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-fullscreen > .welcome-video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.is-fullscreen > .welcome-video,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-css-fullscreen > .welcome-video,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen > #video,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen > #video,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen > .welcome-video,
+body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:-webkit-full-screen > .welcome-video {
   position: absolute !important;
   inset: 0 !important;
   display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
@@ -4429,22 +4445,13 @@ video{
   transform: none !important;
   object-fit: cover !important;
   object-position: center center !important;
+  background: #000 !important;
 }
 
-/* The welcome/intro video follows the same fullscreen geometry. */
-#vipVideoBox:fullscreen > .welcome-video,
-#vipVideoBox:-webkit-full-screen > .welcome-video,
-#vipVideoBox.vip-fullscreen > .welcome-video,
-#vipVideoBox.is-fullscreen > .welcome-video,
-#vipVideoBox.vip-css-fullscreen > .welcome-video {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  object-fit: cover !important;
-  object-position: center center !important;
+/* Controls remain layered over the video and do not constrain its size. */
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-fullscreen > .vip-bottom-controls,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox.vip-fullscreen > .landscape-channel-controls,
+html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:fullscreen > .vip-bottom-controls,
+html body > .desktop-layout > #playerSection > #vipVideoBox:fullscreen > .landscape-channel-controls {
+  z-index: 2147483647 !important;
 }
