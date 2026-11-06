@@ -1,27 +1,29 @@
-const CACHE_NAME = 'vip-tv-pwa-v3';
+const CACHE = 'msm-tv-pwa-v6';
 const CORE = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './config.js',
-  './manifest.webmanifest',
-  './vip-network-logo.png',
-  './vip-tv-logo-180.png',
-  './vip-tv-logo-192.png',
-  './vip-tv-logo-512.png',
-  './messenger-icon.webp'
+  '/',
+  '/index.html',
+  '/style.css',
+  '/app.js',
+  '/config.js',
+  '/device-guard.js',
+  '/visitor-login.js',
+  '/pwa.js',
+  '/manifest.webmanifest',
+  '/vip-network-logo.png',
+  '/vip-tv-logo-192.png',
+  '/vip-tv-logo-512.png',
+  '/messenger-icon.webp'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)));
-  self.skipWaiting();
+  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
+  // Wait for the user to approve the update from the in-app prompt.
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+      Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))
     )
   );
   self.clients.claim();
@@ -35,13 +37,13 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request).then(cached =>
-        cached || caches.match('./index.html')
-      ))
+      .catch(() => caches.match(event.request).then(cached => cached || caches.match('/index.html')))
   );
 });
 

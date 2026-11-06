@@ -9,9 +9,33 @@ let current = "All";
 let hls = null;
 let currentChannelIndex = -1;
 let visibleChannels = [];
+let catalogueRenderLimit = 60;
+const CATALOGUE_PAGE_SIZE = 60;
+let playerReturnScrollY = 0;
+let playerReturnGridScrollTop = 0;
+let playerFullscreenGridScrollTop = 0;
+let playerOpenedFromCard = false;
+
+// Free/Paid channel display rules. These 19 channels are FREE by default; all others are PAID.
+const FREE_DEFAULTS = ['A Sports HD','ATN Bangla','BTV','Makkah Live','Independent','RTV','Ananda TV','HUM TV','Sony Max 2','Sony Aath','Enter 10 Bangla','Zee Bangla HD','B4U Music','Sony YaY','9XM','T Sports HD','Star Sports SL 2','Sony Ten 1','Star Sports 1'];
+let channelAccess = {};
+function normalizeAccessName(v){ return String(v || '').replace(/\s+/g,' ').trim().toLowerCase(); }
+function defaultChannelAccess(name){ const n=normalizeAccessName(name); return FREE_DEFAULTS.some(x=>normalizeAccessName(x)===n)?'free':'paid'; }
+function getChannelAccess(name){ const k=normalizeAccessName(name); return Object.prototype.hasOwnProperty.call(channelAccess,k) ? (channelAccess[k]==='free'?'free':'paid') : defaultChannelAccess(name); }
+async function loadChannelAccess(){
+  try {
+    const base=(VIP_WORKER_API || location.origin).replace(/\/$/,'');
+    const r=await fetch(base+'/api/admin/settings',{cache:'no-store'});
+    if(!r.ok) return;
+    const d=await r.json(); const s=d && (d.settings || d);
+    channelAccess=s && s.channelAccess && typeof s.channelAccess==='object' ? s.channelAccess : {};
+  } catch(e) { channelAccess={}; }
+}
 
 const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
+const channelSearch = document.getElementById("channelSearch");
+const channelFooter = document.querySelector(".site-footer");
 const video = document.getElementById("video");
 const section = document.getElementById("playerSection");
 const welcomeVideo = document.getElementById("welcomeVideo");
@@ -125,7 +149,113 @@ const vipMute = document.getElementById("vipMute");
 const vipVolume = document.getElementById("vipVolume");
 const vipFullscreen = document.getElementById("vipFullscreen");
 const vipFullscreenLauncher = document.getElementById("vipFullscreenLauncher");
+const vipSettings = document.getElementById("vipSettings");
+const vipSettingsMenu = document.getElementById("vipSettingsMenu");
+const vipSettingsClose = document.getElementById("vipSettingsClose");
+const vipQualityOptions = document.getElementById("vipQualityOptions");
+const vipQualityStatus = document.getElementById("vipQualityStatus");
+const vipScalingOptions = document.getElementById("vipScalingOptions");
 let vipControlsTimer = null;
+let preferredVideoQuality = "auto";
+let preferredVideoScaling = "fill";
+try { preferredVideoQuality = localStorage.getItem("msmtv-video-quality") || "auto"; } catch(e) {}
+try { preferredVideoScaling = localStorage.getItem("msmtv-video-scaling") || "fill"; } catch(e) {}
+
+function updateSettingsSelection(container, attribute, value) {
+  if (!container) return;
+  container.querySelectorAll("button[" + attribute + "]").forEach(function(btn) {
+    const selected = btn.getAttribute(attribute) === String(value);
+    btn.classList.toggle("selected", selected);
+    btn.setAttribute("aria-pressed", selected ? "true" : "false");
+  });
+}
+function applyVideoScaling() {
+  // Fixed default: Fill screen. No player settings menu is shown.
+  preferredVideoScaling = "fill";
+  if (video) {
+    video.style.objectFit = "cover";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.transform = "none";
+    video.style.aspectRatio = "auto";
+  }
+  if (welcomeVideo) {
+    welcomeVideo.style.objectFit = "cover";
+    welcomeVideo.style.width = "100%";
+    welcomeVideo.style.height = "100%";
+    welcomeVideo.style.transform = "none";
+  }
+}
+
+function availableHlsLevel(targetHeight) {
+  if (!hls || !Array.isArray(hls.levels) || !hls.levels.length) return -1;
+  const candidates = hls.levels.map(function(level, index) {
+    return {index:index, height:Number(level.height) || 0};
+  }).filter(function(level) { return level.height > 0; });
+  if (!candidates.length) return -1;
+  const below = candidates.filter(function(level) { return level.height <= targetHeight; });
+  const pool = below.length ? below : candidates;
+  pool.sort(function(a,b) { return Math.abs(a.height-targetHeight)-Math.abs(b.height-targetHeight); });
+  return pool[0].index;
+}
+function updateQualityButtons() {
+  updateSettingsSelection(vipQualityOptions, "data-quality", preferredVideoQuality);
+  if (!vipQualityStatus) return;
+  if (preferredVideoQuality === "auto") {
+    vipQualityStatus.textContent = "Auto: নেটওয়ার্ক অনুযায়ী ভিডিও কোয়ালিটি বদলাবে";
+    return;
+  }
+  if (hls && Array.isArray(hls.levels) && hls.levels.length) {
+    const idx = availableHlsLevel(Number(preferredVideoQuality));
+    const actual = idx >= 0 ? Number(hls.levels[idx].height) : 0;
+    vipQualityStatus.textContent = actual ? ("নির্বাচিত: " + preferredVideoQuality + "p · সোর্স: " + actual + "p") : "এই স্ট্রিমে নির্দিষ্ট কোয়ালিটি পাওয়া যায়নি";
+  } else {
+    vipQualityStatus.textContent = "এই চ্যানেলে আলাদা কোয়ালিটি নেই; Auto/মূল স্ট্রিম চলবে";
+  }
+}
+function applyPreferredQuality() {
+  if (!hls) { updateQualityButtons(); return; }
+  if (preferredVideoQuality === "auto") {
+    hls.currentLevel = -1;
+    hls.nextLevel = -1;
+  } else {
+    const idx = availableHlsLevel(Number(preferredVideoQuality));
+    if (idx >= 0) hls.currentLevel = idx;
+  }
+  updateQualityButtons();
+}
+function setPreferredQuality(value) {
+  preferredVideoQuality = value || "auto";
+  try { localStorage.setItem("msmtv-video-quality", preferredVideoQuality); } catch(e) {}
+  applyPreferredQuality();
+  updateQualityButtons();
+  showVipControls();
+}
+function openPlayerSettings() {
+  if (!vipSettingsMenu) return;
+  vipSettingsMenu.hidden = false;
+  vipSettings && vipSettings.setAttribute("aria-expanded", "true");
+  updateQualityButtons();
+  updateSettingsSelection(vipScalingOptions, "data-scaling", preferredVideoScaling);
+  showVipControls();
+}
+function closePlayerSettings() {
+  if (!vipSettingsMenu) return;
+  vipSettingsMenu.hidden = true;
+  vipSettings && vipSettings.setAttribute("aria-expanded", "false");
+}
+if (vipSettings) vipSettings.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); if (vipSettingsMenu && !vipSettingsMenu.hidden) closePlayerSettings(); else openPlayerSettings(); });
+if (vipSettingsClose) vipSettingsClose.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); closePlayerSettings(); });
+if (vipQualityOptions) vipQualityOptions.addEventListener("click", function(e) {
+  const btn = e.target.closest("button[data-quality]"); if (!btn) return;
+  e.preventDefault(); e.stopPropagation(); setPreferredQuality(btn.getAttribute("data-quality"));
+});
+if (vipScalingOptions) vipScalingOptions.addEventListener("click", function(e) {
+  const btn = e.target.closest("button[data-scaling]"); if (!btn) return;
+  e.preventDefault(); e.stopPropagation(); applyVideoScaling(btn.getAttribute("data-scaling")); showVipControls();
+});
+applyVideoScaling(preferredVideoScaling);
+updateQualityButtons();
 
 function showVipControls() {
   if (!vipVideoBox) return;
@@ -147,7 +277,7 @@ function toggleVipControls() {
 
 if (vipVideoBox) {
   vipVideoBox.addEventListener("click", function(e) {
-    if (e.target.closest("button,input,.plyr__controls,.landscape-channel-controls,.vip-bottom-controls")) return;
+    if (e.target.closest("button,input,.plyr__controls,.landscape-channel-controls,.vip-bottom-controls,.vip-settings-menu")) return;
     toggleVipControls();
   });
 }
@@ -188,12 +318,38 @@ function esc(value) {
   });
 }
 
+function normalizeCategoryKey(value) {
+  const v = String(value || "").trim().toUpperCase();
+  if (v === "ALL") return "ALL";
+  if (v === "SPORTS" || v === "SPORT") return "SPORTS";
+  if (v === "BD" || v === "BANGLADESH") return "BD";
+  if (v === "INDIA" || v === "INDIAN") return "INDIA";
+  if (v === "OTHER" || v === "OTHERS") return "OTHER";
+  if (v === "MOVIE & SERIES" || v === "MOVIES & SERIES" || v === "MOVIE" || v === "MOVIES" || v === "SERIES") return "MOVIE & SERIES";
+  return v;
+}
+
 function catFor(name, group) {
-  const text = ((name || "") + " " + (group || "")).toLowerCase();
+  const rawGroup = String(group || "").trim();
+  const groupKey = normalizeCategoryKey(rawGroup);
+
+  // Always trust an explicit playlist category/group first.
+  // This prevents a Live TV channel whose name contains words like
+  // "movie" or "series" from being moved into Movie & Series.
+  if (["SPORTS", "BD", "INDIA", "OTHER", "MOVIE & SERIES"].includes(groupKey)) {
+    return groupKey;
+  }
+
+  const text = ((name || "") + " " + rawGroup).toLowerCase();
+
+  // Only infer Movie & Series when there is no canonical explicit category.
+  if (/movie\s*(?:&|and)\s*series|movies?\s*(?:&|and)\s*series|\bseries\b|\bmovie\b|\bmovies\b|cinema|film|netflix|prime\s*video|hoichoi|bioscope/.test(text)) {
+    return "MOVIE & SERIES";
+  }
 
   // SPORTS comes first, so sports channels stay together even if they are BD/India.
   if (/sport|cricket|football|fifa|eurosport|willow|ten\s*cricket|ptv\s*sports|tsn|espn|bein|wwe|golf|nfl|nba/.test(text)) {
-    return "Sports";
+    return "SPORTS";
   }
 
   // Bangladesh channels
@@ -203,10 +359,10 @@ function catFor(name, group) {
 
   // India channels
   if (/india|indian|sony|zee|star|colors|set\b|sab\b|aaj tak|ndtv|republic|news18|times now|india tv|dd national|dd sports|sun tv|asianet|vijay|jaya|starplus|star gold|sony max|sony pix|sony wah|sony yay|sony pal|&pictures|b4u|movies now|mnx|hbo india/.test(text)) {
-    return "India";
+    return "INDIA";
   }
 
-  return "Others";
+  return "OTHER";
 }
 
 function parseM3U(text) {
@@ -250,70 +406,160 @@ function parseM3U(text) {
   return out;
 }
 
-function render() {
-  const q = "";
 
-  grid.innerHTML = "";
+function fitChannelLabels(root) {
+  const scope = root || document;
+  scope.querySelectorAll(".label").forEach(function (label) {
+    const text = label.querySelector(".label-text");
+    if (!text) return;
 
-  const list = channels.filter(function (c) {
-    const categoryOk = current === "All" || c.cat === current;
-    const searchOk = c.name.toLowerCase().includes(q);
-    return categoryOk && searchOk;
-  });
-  visibleChannels = list;
+    text.style.transform = "none";
+    text.style.fontSize = "";
 
-  empty.hidden = list.length > 0;
-  if (!list.length) {
-    empty.textContent = channels.length ? "No channels found" : "Loading channels...";
-  }
+    const available = Math.max(1, label.clientWidth - 8);
+    const baseSize = parseFloat(getComputedStyle(label).fontSize) || 10;
+    let size = baseSize;
 
-  list.forEach(function (c) {
-    const el = document.createElement("article");
-    el.className = "card";
+    text.style.fontSize = size + "px";
 
-    const icon = c.logo
-      ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy">'
-      : "<span>TV</span>";
+    // First reduce the font slightly for long names.
+    while (text.scrollWidth > available && size > 7) {
+      size -= 0.5;
+      text.style.fontSize = size + "px";
+    }
 
-    el.innerHTML =
-      '<div class="circle">' + icon + '</div>' +
-      '<div class="label">' + esc(c.name) + '</div>';
-
-    el.addEventListener("click", function () {
-      play(c, el);
-    });
-
-    grid.appendChild(el);
+    // If it is still too long, scale the text horizontally just enough
+    // to keep the complete name visible inside the same badge.
+    if (text.scrollWidth > available) {
+      const scale = Math.max(0.35, available / text.scrollWidth);
+      text.style.transform = "scaleX(" + scale + ")";
+    }
   });
 }
 
-function play(c, clickedCard, retryOriginal) {
+function ensureRgbLoadMoreStyle() {
+  if (document.getElementById("rgbLoadMoreStyle")) return;
+  const style = document.createElement("style");
+  style.id = "rgbLoadMoreStyle";
+  style.textContent = `
+    .catalogue-load-more[hidden] { display: none !important; }
+    .catalogue-load-more { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #fff; font-weight: 800 !important; letter-spacing: .2px; text-shadow: none !important; animation: msmtv-rgb-text 3.2s linear infinite; -webkit-tap-highlight-color: transparent; }
+    .catalogue-load-more:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+    @keyframes msmtv-rgb-text { 0%{color:#fff} 16%{color:#ff3434} 33%{color:#ffdf35} 50%{color:#24f06a} 66%{color:#32dfff} 83%{color:#b45cff} 100%{color:#fff} }
+  `;
+  document.head.appendChild(style);
+}
+
+function render() {
+  ensureRgbLoadMoreStyle();
+  const q = channelSearch ? channelSearch.value.trim().toLocaleLowerCase() : "";
+  grid.innerHTML = "";
+  const selectedCategory = normalizeCategoryKey(current);
+  const list = channels.filter(function (c) {
+    const categoryOk = q ? true : (selectedCategory === "ALL" || normalizeCategoryKey(c.cat) === selectedCategory);
+    const name = String(c.name || "").trim().toLocaleLowerCase();
+    const searchOk = !q || name.startsWith(q);
+    return categoryOk && searchOk;
+  });
+  visibleChannels = list;
+  empty.hidden = list.length > 0;
+  if (!list.length) empty.textContent = channels.length ? "দুঃখিত! কোনো চ্যানেল পাওয়া যায়নি" : "Loading channels...";
+
+  // Render only a small batch of cards. The complete catalogue remains searchable/playable,
+  // while the DOM stays lightweight for large Movie & Series playlists.
+  const shown = list.slice(0, catalogueRenderLimit);
+  shown.forEach(function (c) {
+    const el = document.createElement("article");
+    el.className = "card";
+    const icon = c.logo
+      ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy" decoding="async">'
+      : "<span>TV</span>";
+    el.innerHTML =
+      '<div class="circle">' + icon + '</div>' +
+      '<img class="vip-paid-crown" loading="lazy" src="https://i.postimg.cc/g05JdqSY/Blue-Star-symbol.png" alt="Channel star" title="Channel">' +
+      '<div class="label"><span class="label-text">' + esc(c.name) + '</span></div>';
+    el.addEventListener("click", function (e) { e.preventDefault(); play(c, el, false, true); });
+    grid.appendChild(el);
+    fitChannelLabels(el);
+  });
+
+  let more = document.getElementById("catalogueLoadMore");
+  if (!more) {
+    more = document.createElement("button");
+    more.id = "catalogueLoadMore";
+    more.type = "button";
+    more.className = "catalogue-load-more";
+    more.style.cssText = "margin:18px auto;padding:12px 22px;background:transparent;border:0;box-shadow:none;font-weight:800;cursor:pointer";
+    more.addEventListener("click", function () {
+      // Preserve the channel-list scroll position while appending the next batch.
+      const previousScrollTop = grid.scrollTop;
+      catalogueRenderLimit += CATALOGUE_PAGE_SIZE;
+      render();
+      requestAnimationFrame(function () {
+        grid.scrollTop = previousScrollTop;
+      });
+    });
+  }
+  // Keep the count/load-more control inside the scrollable channel list.
+  more.hidden = shown.length >= list.length;
+  more.textContent = "আরও দেখুন (" + shown.length + "/" + list.length + ")";
+  grid.appendChild(more);
+
+  // Copyright belongs after the channel catalogue, not over the first row.
+  if (channelFooter) grid.appendChild(channelFooter);
+}
+
+function play(c, clickedCard, retryOriginal, fromUserClick) {
+  if (!retryOriginal && !playerOpenedFromCard) {
+    playerReturnScrollY = window.scrollY || window.pageYOffset || 0;
+    playerReturnGridScrollTop = grid ? grid.scrollTop : 0;
+    playerOpenedFromCard = true;
+  }
   currentChannelIndex = visibleChannels.indexOf(c);
+  closePlayerSettings();
   if (welcomeVideo) welcomeVideo.classList.add("welcome-hidden");
   if (videoBox) videoBox.classList.remove("welcome-active");
+
+  // Always open/show the player before touching the stream source.
+  section.hidden = false;
+  section.removeAttribute("hidden");
+  section.style.display = "block";
+  section.style.visibility = "visible";
+  if (clickedCard) clickedCard.setAttribute("aria-current", "true");
+  document.getElementById("playerTitle").textContent = c.name || "Live Player";
+  document.getElementById("note").style.display = "none";
+
   const liveBadge = document.getElementById("liveBadge");
   if (liveBadge) liveBadge.style.display = "flex";
 
-  section.hidden = false;
-  document.getElementById("playerTitle").textContent = c.name;
-  document.getElementById("note").style.display = "none";
+  if (hls) { try { hls.destroy(); } catch (e) {} hls = null; }
 
-  if (hls) {
-    try { hls.destroy(); } catch (e) {}
-    hls = null;
-  }
-
-  video.pause();
-  video.removeAttribute("src");
-  video.load();
+  const isMovieSeries = normalizeCategoryKey(c.cat) === "MOVIE & SERIES";
+  if (videoBox) videoBox.classList.toggle("movie-native-player", isMovieSeries);
+  // Movie & Series needs the browser's native timeline so viewers can seek forward/backward.
+  // Keep native controls disabled for live channels, where seeking is not supported.
+  video.controls = isMovieSeries;
+  video.setAttribute("playsinline", "");
   video.autoplay = true;
   video.playsInline = true;
   video.muted = false;
   video.volume = 1;
+  video.style.visibility = "visible";
+  video.style.opacity = "1";
+  video.style.display = "block";
 
-  const originalUrl = c.url;
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+
+  const originalUrl = String(c.url || "").trim();
   let fallbackUsed = !retryOriginal && c._usingFallback === true;
   const sourceUrl = fallbackUsed ? STREAM_FALLBACK_URL : originalUrl;
+  // HTTPS pages cannot play HTTP media directly (mixed-content blocking).
+  // Route all HTTP media through the site's HTTPS stream proxy; keep HTTPS URLs direct.
+  const playbackUrl = /^http:\/\//i.test(sourceUrl)
+    ? (location.origin + '/api/stream-proxy?url=' + encodeURIComponent(sourceUrl))
+    : sourceUrl;
 
   function showPlaybackError() {
     const note = document.getElementById("note");
@@ -321,17 +567,22 @@ function play(c, clickedCard, retryOriginal) {
     note.style.display = "block";
   }
 
+  function startPlayback() {
+    if (!sourceUrl) { showPlaybackError(); return; }
+    const p = video.play();
+    if (p && p.catch) p.catch(function(err) {
+      // Do not replace a real stream just because Chrome blocked autoplay.
+      // The user can press the native Play button for Movie & Series.
+      // Chrome may reject autoplay; the stream is still loaded and can be started by the player control.
+      if (fromUserClick) showPlaybackError();
+    });
+  }
+
   function switchToFallback() {
-    if (fallbackUsed) {
-      showPlaybackError();
-      return;
-    }
+    if (fallbackUsed) { showPlaybackError(); return; }
     fallbackUsed = true;
     c._usingFallback = true;
-    if (hls) {
-      try { hls.destroy(); } catch (e) {}
-      hls = null;
-    }
+    if (hls) { try { hls.destroy(); } catch (e) {} hls = null; }
     video.pause();
     video.removeAttribute("src");
     video.load();
@@ -341,60 +592,123 @@ function play(c, clickedCard, retryOriginal) {
     startPlayback();
   }
 
-  function startPlayback() {
-    const p = video.play();
-    if (p && p.catch) p.catch(function () {
-      if (!fallbackUsed) switchToFallback();
-      else showPlaybackError();
-    });
-  }
-
-  if (/\.m3u8(\?|$)/i.test(sourceUrl) && window.Hls && Hls.isSupported()) {
-    hls = new Hls({ enableWorker:true, lowLatencyMode:true, backBufferLength:30 });
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-      if (hls) hls.loadSource(sourceUrl);
-    });
-    hls.on(Hls.Events.MANIFEST_PARSED, function () {
-      video.muted = false;
-      video.volume = 1;
-      startPlayback();
-    });
-    hls.on(Hls.Events.ERROR, function (_event, data) {
-      if (!data || !data.fatal || !hls) return;
-      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        try { hls.recoverMediaError(); } catch (e) {}
-      } else {
-        try { hls.destroy(); } catch (e) {}
-        hls = null;
-        switchToFallback();
-      }
-    });
+  // HLS streams: use hls.js on Chrome/Edge/Firefox and native HLS where available.
+  if (/\.m3u8(?:\?|$)/i.test(sourceUrl)) {
+    if (window.Hls && Hls.isSupported()) {
+      hls = new Hls({ enableWorker:true, lowLatencyMode:true, backBufferLength:30 });
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+        if (hls) hls.loadSource(playbackUrl);
+      });
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        applyPreferredQuality();
+        startPlayback();
+      });
+      hls.on(Hls.Events.LEVEL_SWITCHED, function() { updateQualityButtons(); });
+      hls.on(Hls.Events.ERROR, function(_event, data) {
+        if (!data || !data.fatal || !hls) return;
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          try { hls.recoverMediaError(); } catch(e) { switchToFallback(); }
+        } else {
+          switchToFallback();
+        }
+      });
+    } else {
+      // Safari/iOS can play HLS directly.
+      video.src = playbackUrl;
+      video.addEventListener("loadedmetadata", startPlayback, {once:true});
+      video.addEventListener("error", function(){ showPlaybackError(); }, {once:true});
+      video.load();
+    }
   } else {
-    video.src = sourceUrl;
+    // MP4 and other browser-native formats.
+    video.src = playbackUrl;
     video.addEventListener("loadedmetadata", startPlayback, {once:true});
     video.addEventListener("canplay", startPlayback, {once:true});
-    video.addEventListener("error", function () {
-      if (!fallbackUsed) switchToFallback();
-      else showPlaybackError();
+    video.addEventListener("error", function() {
+      if (!fallbackUsed) switchToFallback(); else showPlaybackError();
     }, {once:true});
+    video.load();
     startPlayback();
   }
 }
 
+async function requestNativeFullscreen() {
+  if (!videoBox) return;
+  try {
+    if (videoBox.requestFullscreen) {
+      await videoBox.requestFullscreen({ navigationUI: "hide" });
+      return;
+    }
+    if (videoBox.webkitRequestFullscreen) {
+      videoBox.webkitRequestFullscreen();
+      return;
+    }
+  } catch (e) {
+    // Fall through to CSS fullscreen if native fullscreen is unavailable/blocked.
+  }
+  videoBox.classList.add("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
+  document.body.classList.add("vip-player-fullscreen");
+}
+
+async function exitNativeFullscreen() {
+  try {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      await document.exitFullscreen();
+    } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  } catch (e) {}
+  if (videoBox) {
+    videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
+  }
+  document.body.classList.remove("vip-player-fullscreen");
+}
+
+function isBrowserNativeFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function isCssPlayerFullscreen() {
+  return !!(videoBox && videoBox.classList.contains("vip-css-fullscreen"));
+}
+
 function isNativeFullscreen() {
-  return !!(document.fullscreenElement || (videoBox && videoBox.classList.contains("vip-css-fullscreen")));
+  return isBrowserNativeFullscreen() || isCssPlayerFullscreen();
+}
+
+// Important: native fullscreen and our CSS fullscreen are two different states.
+// Android can exit native fullscreen with its Back button without removing our
+// CSS class. Never treat that stale class as proof that native fullscreen is active.
+function cleanupAfterNativeFullscreenExit() {
+  if (isBrowserNativeFullscreen()) return;
+  if (videoBox) {
+    videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen", "vip-orientation-fallback");
+  }
+  document.body.classList.remove("vip-player-fullscreen");
+  try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
 }
 
 async function toggleNativeFullscreen() {
+  const wasPlaying = !video.paused && !video.ended;
   if (isNativeFullscreen()) {
     await exitNativeFullscreen();
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    restorePlayerGridScroll();
   } else {
+    playerFullscreenGridScrollTop = grid ? grid.scrollTop : playerReturnGridScrollTop;
     await requestNativeFullscreen();
+    try {
+      if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
+    } catch (e) {}
   }
   syncFullscreenState();
   setTimeout(syncFullscreenState, 120);
   setTimeout(syncFullscreenState, 500);
+  if (wasPlaying && video.paused) {
+    const p = video.play();
+    if (p && p.catch) p.catch(function(){});
+  }
 }
 
 function setFullscreenButtonState() {
@@ -407,6 +721,17 @@ function setFullscreenButtonState() {
   document.body.classList.toggle("vip-player-fullscreen", isFs);
   const controls = document.getElementById("landscapeChannelControls");
   if (controls) controls.setAttribute("aria-hidden", isFs ? "false" : "true");
+}
+
+function restorePlayerGridScroll() {
+  if (!grid) return;
+  const target = Number.isFinite(playerFullscreenGridScrollTop)
+    ? playerFullscreenGridScrollTop
+    : playerReturnGridScrollTop;
+  requestAnimationFrame(function () {
+    grid.scrollTop = target;
+    requestAnimationFrame(function () { grid.scrollTop = target; });
+  });
 }
 
 function syncFullscreenState() {
@@ -435,14 +760,32 @@ document.getElementById("nextChannel").addEventListener("click", function(e) {
   e.preventDefault(); e.stopPropagation(); changeChannel(1); showVipControls();
 });
 
-window.addEventListener("orientationchange", syncFullscreenState);
-document.addEventListener("fullscreenchange", syncFullscreenState);
-document.addEventListener("webkitfullscreenchange", syncFullscreenState);
+window.addEventListener("orientationchange", function () {
+  syncFullscreenState();
+  setTimeout(function () { if (!isNativeFullscreen()) restorePlayerGridScroll(); }, 150);
+  setTimeout(function () { if (!isNativeFullscreen()) restorePlayerGridScroll(); }, 600);
+});
+document.addEventListener("fullscreenchange", function () {
+  cleanupAfterNativeFullscreenExit();
+  syncFullscreenState();
+  if (!isBrowserNativeFullscreen()) {
+    restorePlayerGridScroll();
+    setTimeout(restorePlayerGridScroll, 150);
+    setTimeout(restorePlayerGridScroll, 600);
+  }
+});
+document.addEventListener("webkitfullscreenchange", function () {
+  cleanupAfterNativeFullscreenExit();
+  syncFullscreenState();
+  if (!isBrowserNativeFullscreen()) {
+    restorePlayerGridScroll();
+    setTimeout(restorePlayerGridScroll, 150);
+    setTimeout(restorePlayerGridScroll, 600);
+  }
+});
 syncFullscreenState();
 
 function closePlayer() {
-  section.hidden = false;
-
   if (hls) {
     hls.destroy();
     hls = null;
@@ -451,6 +794,26 @@ function closePlayer() {
   video.pause();
   video.removeAttribute("src");
   video.load();
+  video.style.visibility = "hidden";
+  video.style.opacity = "0";
+
+  // Close the player and return to the exact channel-grid position.
+  section.hidden = true;
+  section.style.display = "none";
+  if (welcomeVideo) welcomeVideo.classList.add("welcome-hidden");
+  if (videoBox) videoBox.classList.remove("welcome-active");
+
+  const y = playerReturnScrollY;
+  const gridY = playerReturnGridScrollTop;
+  playerOpenedFromCard = false;
+  requestAnimationFrame(function(){
+    window.scrollTo({top:y, left:0, behavior:"auto"});
+    if (grid) grid.scrollTop = gridY;
+    requestAnimationFrame(function(){
+      window.scrollTo({top:y, left:0, behavior:"auto"});
+      if (grid) grid.scrollTop = gridY;
+    });
+  });
 }
 
 document.getElementById("closePlayer").addEventListener("click", closePlayer);
@@ -462,10 +825,18 @@ document.querySelectorAll("#cats button").forEach(function (button) {
     });
 
     button.classList.add("active");
-    current = button.dataset.cat;
+    current = normalizeCategoryKey(button.dataset.cat);
+    catalogueRenderLimit = CATALOGUE_PAGE_SIZE;
     render();
   });
 });
+
+if (channelSearch) {
+  channelSearch.addEventListener("input", function () {
+    currentChannelIndex = -1;
+    render();
+  });
+}
 
 empty.hidden = false;
 empty.textContent = "Loading channels...";
@@ -536,7 +907,7 @@ async function loadVipPlaylist() {
           return list.map(function(c){
             return {
               name:c.name||"Live Channel",
-              cat:catFor(c.name,c.category),
+              cat:normalizeCategoryKey(c.category || catFor(c.name, "")),
               url:c.url||"",
               logo:c.logo||""
             };
@@ -596,20 +967,22 @@ async function loadVipNotice() {
   } catch (e) {}
 }
 
-Promise.all([loadVipPlaylist(), loadVipNotice()])
-  .then(function (result) {
-    const parsed = result[0];
-    if (!parsed.length) throw new Error("No valid channels");
-    channels = parsed;
-    render();
-  })
-  .catch(function (error) {
-    console.error(error);
-    empty.hidden = false;
-    empty.textContent = "Playlist load করা যায়নি। M3U link check করুন।";
-  });
+loadChannelAccess().then(function(){
+  return Promise.all([loadVipPlaylist(), loadVipNotice()]);
+}).then(function (result) {
+  const parsed = result[0];
+  if (!parsed.length) throw new Error("No valid channels");
+  channels = parsed;
+  render();
+}).catch(function (error) {
+  console.error(error);
+  empty.hidden = false;
+  empty.textContent = "Playlist load করা যায়নি। M3U link check করুন।";
+});
 
-
+/* paid-crown init above */
+/* ORIGINAL Promise.all replaced */
+/* __END_PAID_PATCH__ */
 /* V14: keep the page as a real root document scroll. Android Chrome can only
    collapse its address/search bar from root-page scrolling, not from a nested
    fixed #grid scroller. */
@@ -662,3 +1035,12 @@ document.addEventListener("DOMContentLoaded", function(){
     touchMoved = false;
   }, {passive:true});
 })();
+
+
+window.addEventListener("resize", function () {
+  fitChannelLabels(document);
+});
+
+window.addEventListener("load", function () {
+  fitChannelLabels(document);
+});
