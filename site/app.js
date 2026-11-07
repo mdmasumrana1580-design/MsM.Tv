@@ -635,33 +635,44 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
 
 async function requestNativeFullscreen() {
   if (!videoBox) return;
+
+  // Prefer the browser's real fullscreen API when available.
   try {
-    if (videoBox.requestFullscreen) {
+    if (typeof videoBox.requestFullscreen === "function") {
       await videoBox.requestFullscreen({ navigationUI: "hide" });
       return;
     }
-    if (videoBox.webkitRequestFullscreen) {
+    if (typeof videoBox.webkitRequestFullscreen === "function") {
       videoBox.webkitRequestFullscreen();
       return;
     }
   } catch (e) {
-    // Fall through to CSS fullscreen if native fullscreen is unavailable/blocked.
+    // Some Android WebViews block native fullscreen; use the CSS fallback.
   }
+
+  // CSS fullscreen fallback for browsers/WebViews without native fullscreen.
   videoBox.classList.add("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
+  document.documentElement.classList.add("vip-player-fullscreen");
   document.body.classList.add("vip-player-fullscreen");
 }
 
 async function exitNativeFullscreen() {
-  try {
-    if (document.fullscreenElement && document.exitFullscreen) {
-      await document.exitFullscreen();
-    } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  } catch (e) {}
+  const usingCssFallback = !!(videoBox && videoBox.classList.contains("vip-css-fullscreen"));
+
+  if (!usingCssFallback) {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    } catch (e) {}
+  }
+
   if (videoBox) {
     videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
   }
+  document.documentElement.classList.remove("vip-player-fullscreen");
   document.body.classList.remove("vip-player-fullscreen");
 }
 
@@ -685,6 +696,7 @@ function cleanupAfterNativeFullscreenExit() {
   if (videoBox) {
     videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen", "vip-orientation-fallback");
   }
+  document.documentElement.classList.remove("vip-player-fullscreen");
   document.body.classList.remove("vip-player-fullscreen");
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
 }
