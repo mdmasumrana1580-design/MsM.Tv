@@ -4513,92 +4513,48 @@ video{
   #vipVideoBox.video-box{border-width:5px !important;border-radius:12px !important;}
 }
 
-
-/* ===== MsM.Tv FINAL FULLSCREEN OVERRIDE ===== */
-html.vip-player-fullscreen,
-body.vip-player-fullscreen {
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  overscroll-behavior: none !important;
-}
+/* VIP NETWORK — FILL SCREEN */
 #vipVideoBox:fullscreen,
 #vipVideoBox:-webkit-full-screen,
-#vipVideoBox.vip-css-fullscreen,
 #vipVideoBox.vip-fullscreen,
-#vipVideoBox.is-fullscreen {
+#vipVideoBox.is-fullscreen,
+#vipVideoBox.vip-css-fullscreen {
   position: fixed !important;
   inset: 0 !important;
-  display: block !important;
-  box-sizing: border-box !important;
   width: 100vw !important;
-  height: 100vh !important;
   height: 100dvh !important;
   min-width: 100vw !important;
-  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  z-index: 2147483646 !important;
+}
+
+#vipVideoBox:fullscreen > video#video,
+#vipVideoBox:-webkit-full-screen > video#video,
+#vipVideoBox.vip-fullscreen > video#video,
+#vipVideoBox.is-fullscreen > video#video,
+#vipVideoBox.vip-css-fullscreen > video#video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-width: 100vw !important;
   min-height: 100dvh !important;
   max-width: none !important;
   max-height: none !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  border-radius: 0 !important;
-  overflow: hidden !important;
-  background: #000 !important;
-  z-index: 2147483647 !important;
-}
-#vipVideoBox:fullscreen > video,
-#vipVideoBox:-webkit-full-screen > video,
-#vipVideoBox.vip-css-fullscreen > video,
-#vipVideoBox.vip-fullscreen > video,
-#vipVideoBox.is-fullscreen > video {
-  position: absolute !important;
-  inset: 0 !important;
-  display: block !important;
-  box-sizing: border-box !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
+  transform: none !important;
   object-fit: fill !important;
   object-position: center center !important;
-  transform: none !important;
-  background: #000 !important;
-}
-#vipVideoBox:fullscreen #video,
-#vipVideoBox:-webkit-full-screen #video,
-#vipVideoBox.vip-css-fullscreen #video,
-#vipVideoBox.vip-fullscreen #video,
-#vipVideoBox.is-fullscreen #video,
-#vipVideoBox:fullscreen #welcomeVideo,
-#vipVideoBox:-webkit-full-screen #welcomeVideo,
-#vipVideoBox.vip-css-fullscreen #welcomeVideo,
-#vipVideoBox.vip-fullscreen #welcomeVideo,
-#vipVideoBox.is-fullscreen #welcomeVideo {
-  object-fit: fill !important;
-}
-#vipVideoBox:fullscreen .live-badge,
-#vipVideoBox:-webkit-full-screen .live-badge,
-#vipVideoBox.vip-css-fullscreen .live-badge,
-#vipVideoBox.vip-fullscreen .live-badge,
-#vipVideoBox.is-fullscreen .live-badge,
-#vipVideoBox:fullscreen .vip-bottom-controls,
-#vipVideoBox:-webkit-full-screen .vip-bottom-controls,
-#vipVideoBox.vip-css-fullscreen .vip-bottom-controls,
-#vipVideoBox.vip-fullscreen .vip-bottom-controls,
-#vipVideoBox.is-fullscreen .vip-bottom-controls,
-#vipVideoBox:fullscreen .landscape-channel-controls,
-#vipVideoBox:-webkit-full-screen .landscape-channel-controls,
-#vipVideoBox.vip-css-fullscreen .landscape-channel-controls,
-#vipVideoBox.vip-fullscreen .landscape-channel-controls,
-#vipVideoBox.is-fullscreen .landscape-channel-controls {
-  z-index: 2147483647 !important;
+  display: block !important;
 }
