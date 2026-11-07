@@ -2598,7 +2598,7 @@ body.vip-player-fullscreen{overflow:hidden!important;background:#000!important;}
    1024px and above
 ================================ */
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
 
   html,
   body {
@@ -3803,4 +3803,24 @@ video{
   outline: 3px solid #ffd54a !important;
   outline-offset: 4px;
   box-shadow: 0 0 0 5px rgba(255,213,74,.22);
+}
+
+
+/* MsM.Tv automatic device layout:
+   Desktop layout requires a real fine-pointer/hover device.
+   Touch-first phones stay on the original mobile UI even if "Desktop site" is enabled. */
+@media screen and (hover: none), screen and (pointer: coarse) {
+  body > .desktop-layout {
+    display: contents !important;
+  }
+}
+
+
+/* Slim red-to-green frame around the live video player */
+#playerSection .video-box {
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background:
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(110deg, #ff1025 0%, #ff2638 28%, #18e88a 100%) border-box;
 }
