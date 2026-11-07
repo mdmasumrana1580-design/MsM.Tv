@@ -4465,3 +4465,14 @@ html body > .desktop-layout > #playerSection > #vipVideoBox:fullscreen > .landsc
     display: contents !important;
   }
 }
+
+
+/* Hide the manual Desktop Mode button; device layout switches automatically */
+#desktopModeBtn,
+#desktopToggleBtn,
+.desktop-mode-toggle,
+.desktop-toggle,
+button[aria-label="ডেস্কটপ মোড"],
+button[title="ডেস্কটপ মোড"] {
+  display: none !important;
+}
