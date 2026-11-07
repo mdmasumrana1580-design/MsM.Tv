@@ -4455,3 +4455,32 @@ html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox:full
 html body > .desktop-layout > #playerSection > #vipVideoBox:fullscreen > .landscape-channel-controls {
   z-index: 2147483647 !important;
 }
+
+
+/* MsM.Tv: desktop-mode switch — matching the red/green desktop theme */
+.desktop-mode-toggle{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  min-width:74px!important;
+  height:38px!important;
+  padding:0 10px!important;
+  border:1px solid #00d96b!important;
+  border-radius:10px!important;
+  background:linear-gradient(115deg,#a90019 0%,#15100e 48%,#006b35 100%)!important;
+  color:#fff!important;
+  font:800 11px Arial,sans-serif!important;
+  white-space:nowrap!important;
+  box-shadow:0 0 10px #00d96b35, inset 0 0 8px #ff203025!important;
+  cursor:pointer!important;
+}
+.desktop-mode-toggle.active{
+  border-color:#ff334d!important;
+  background:linear-gradient(115deg,#006b35 0%,#111 48%,#b40020 100%)!important;
+  box-shadow:0 0 12px #ff203045, inset 0 0 8px #00e67625!important;
+}
+.desktop-mode-toggle:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important}
+@media(max-width:420px){
+  .desktop-mode-toggle{height:34px!important;min-width:65px!important;padding:0 7px!important;font-size:10px!important}
+}
