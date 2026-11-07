@@ -137,7 +137,7 @@ async function initVisitorCounter() {
   };
 
   refreshOnline();
-  setInterval(refreshOnline, 15 * 60 * 1000);
+  setInterval(refreshOnline, 20000);
 }
 
 initVisitorCounter();
@@ -149,113 +149,7 @@ const vipMute = document.getElementById("vipMute");
 const vipVolume = document.getElementById("vipVolume");
 const vipFullscreen = document.getElementById("vipFullscreen");
 const vipFullscreenLauncher = document.getElementById("vipFullscreenLauncher");
-const vipSettings = document.getElementById("vipSettings");
-const vipSettingsMenu = document.getElementById("vipSettingsMenu");
-const vipSettingsClose = document.getElementById("vipSettingsClose");
-const vipQualityOptions = document.getElementById("vipQualityOptions");
-const vipQualityStatus = document.getElementById("vipQualityStatus");
-const vipScalingOptions = document.getElementById("vipScalingOptions");
 let vipControlsTimer = null;
-let preferredVideoQuality = "auto";
-let preferredVideoScaling = "fill";
-try { preferredVideoQuality = localStorage.getItem("msmtv-video-quality") || "auto"; } catch(e) {}
-try { preferredVideoScaling = localStorage.getItem("msmtv-video-scaling") || "fill"; } catch(e) {}
-
-function updateSettingsSelection(container, attribute, value) {
-  if (!container) return;
-  container.querySelectorAll("button[" + attribute + "]").forEach(function(btn) {
-    const selected = btn.getAttribute(attribute) === String(value);
-    btn.classList.toggle("selected", selected);
-    btn.setAttribute("aria-pressed", selected ? "true" : "false");
-  });
-}
-function applyVideoScaling() {
-  // Fixed default: Fill screen. No player settings menu is shown.
-  preferredVideoScaling = "fill";
-  if (video) {
-    video.style.objectFit = "fill";
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.transform = "none";
-    video.style.aspectRatio = "auto";
-  }
-  if (welcomeVideo) {
-    welcomeVideo.style.objectFit = "fill";
-    welcomeVideo.style.width = "100%";
-    welcomeVideo.style.height = "100%";
-    welcomeVideo.style.transform = "none";
-  }
-}
-
-function availableHlsLevel(targetHeight) {
-  if (!hls || !Array.isArray(hls.levels) || !hls.levels.length) return -1;
-  const candidates = hls.levels.map(function(level, index) {
-    return {index:index, height:Number(level.height) || 0};
-  }).filter(function(level) { return level.height > 0; });
-  if (!candidates.length) return -1;
-  const below = candidates.filter(function(level) { return level.height <= targetHeight; });
-  const pool = below.length ? below : candidates;
-  pool.sort(function(a,b) { return Math.abs(a.height-targetHeight)-Math.abs(b.height-targetHeight); });
-  return pool[0].index;
-}
-function updateQualityButtons() {
-  updateSettingsSelection(vipQualityOptions, "data-quality", preferredVideoQuality);
-  if (!vipQualityStatus) return;
-  if (preferredVideoQuality === "auto") {
-    vipQualityStatus.textContent = "Auto: নেটওয়ার্ক অনুযায়ী ভিডিও কোয়ালিটি বদলাবে";
-    return;
-  }
-  if (hls && Array.isArray(hls.levels) && hls.levels.length) {
-    const idx = availableHlsLevel(Number(preferredVideoQuality));
-    const actual = idx >= 0 ? Number(hls.levels[idx].height) : 0;
-    vipQualityStatus.textContent = actual ? ("নির্বাচিত: " + preferredVideoQuality + "p · সোর্স: " + actual + "p") : "এই স্ট্রিমে নির্দিষ্ট কোয়ালিটি পাওয়া যায়নি";
-  } else {
-    vipQualityStatus.textContent = "এই চ্যানেলে আলাদা কোয়ালিটি নেই; Auto/মূল স্ট্রিম চলবে";
-  }
-}
-function applyPreferredQuality() {
-  if (!hls) { updateQualityButtons(); return; }
-  if (preferredVideoQuality === "auto") {
-    hls.currentLevel = -1;
-    hls.nextLevel = -1;
-  } else {
-    const idx = availableHlsLevel(Number(preferredVideoQuality));
-    if (idx >= 0) hls.currentLevel = idx;
-  }
-  updateQualityButtons();
-}
-function setPreferredQuality(value) {
-  preferredVideoQuality = value || "auto";
-  try { localStorage.setItem("msmtv-video-quality", preferredVideoQuality); } catch(e) {}
-  applyPreferredQuality();
-  updateQualityButtons();
-  showVipControls();
-}
-function openPlayerSettings() {
-  if (!vipSettingsMenu) return;
-  vipSettingsMenu.hidden = false;
-  vipSettings && vipSettings.setAttribute("aria-expanded", "true");
-  updateQualityButtons();
-  updateSettingsSelection(vipScalingOptions, "data-scaling", preferredVideoScaling);
-  showVipControls();
-}
-function closePlayerSettings() {
-  if (!vipSettingsMenu) return;
-  vipSettingsMenu.hidden = true;
-  vipSettings && vipSettings.setAttribute("aria-expanded", "false");
-}
-if (vipSettings) vipSettings.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); if (vipSettingsMenu && !vipSettingsMenu.hidden) closePlayerSettings(); else openPlayerSettings(); });
-if (vipSettingsClose) vipSettingsClose.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); closePlayerSettings(); });
-if (vipQualityOptions) vipQualityOptions.addEventListener("click", function(e) {
-  const btn = e.target.closest("button[data-quality]"); if (!btn) return;
-  e.preventDefault(); e.stopPropagation(); setPreferredQuality(btn.getAttribute("data-quality"));
-});
-if (vipScalingOptions) vipScalingOptions.addEventListener("click", function(e) {
-  const btn = e.target.closest("button[data-scaling]"); if (!btn) return;
-  e.preventDefault(); e.stopPropagation(); applyVideoScaling(btn.getAttribute("data-scaling")); showVipControls();
-});
-applyVideoScaling(preferredVideoScaling);
-updateQualityButtons();
 
 function showVipControls() {
   if (!vipVideoBox) return;
@@ -277,7 +171,7 @@ function toggleVipControls() {
 
 if (vipVideoBox) {
   vipVideoBox.addEventListener("click", function(e) {
-    if (e.target.closest("button,input,.plyr__controls,.landscape-channel-controls,.vip-bottom-controls,.vip-settings-menu")) return;
+    if (e.target.closest("button,input,.plyr__controls,.landscape-channel-controls,.vip-bottom-controls")) return;
     toggleVipControls();
   });
 }
@@ -516,7 +410,6 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
     playerOpenedFromCard = true;
   }
   currentChannelIndex = visibleChannels.indexOf(c);
-  closePlayerSettings();
   if (welcomeVideo) welcomeVideo.classList.add("welcome-hidden");
   if (videoBox) videoBox.classList.remove("welcome-active");
 
@@ -601,10 +494,8 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
         if (hls) hls.loadSource(playbackUrl);
       });
       hls.on(Hls.Events.MANIFEST_PARSED, function() {
-        applyPreferredQuality();
         startPlayback();
       });
-      hls.on(Hls.Events.LEVEL_SWITCHED, function() { updateQualityButtons(); });
       hls.on(Hls.Events.ERROR, function(_event, data) {
         if (!data || !data.fatal || !hls) return;
         if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
@@ -635,44 +526,33 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
 
 async function requestNativeFullscreen() {
   if (!videoBox) return;
-
-  // Prefer the browser's real fullscreen API when available.
   try {
-    if (typeof videoBox.requestFullscreen === "function") {
+    if (videoBox.requestFullscreen) {
       await videoBox.requestFullscreen({ navigationUI: "hide" });
       return;
     }
-    if (typeof videoBox.webkitRequestFullscreen === "function") {
+    if (videoBox.webkitRequestFullscreen) {
       videoBox.webkitRequestFullscreen();
       return;
     }
   } catch (e) {
-    // Some Android WebViews block native fullscreen; use the CSS fallback.
+    // Fall through to CSS fullscreen if native fullscreen is unavailable/blocked.
   }
-
-  // CSS fullscreen fallback for browsers/WebViews without native fullscreen.
   videoBox.classList.add("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
-  document.documentElement.classList.add("vip-player-fullscreen");
   document.body.classList.add("vip-player-fullscreen");
 }
 
 async function exitNativeFullscreen() {
-  const usingCssFallback = !!(videoBox && videoBox.classList.contains("vip-css-fullscreen"));
-
-  if (!usingCssFallback) {
-    try {
-      if (document.fullscreenElement && document.exitFullscreen) {
-        await document.exitFullscreen();
-      } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-    } catch (e) {}
-  }
-
+  try {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      await document.exitFullscreen();
+    } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  } catch (e) {}
   if (videoBox) {
     videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
   }
-  document.documentElement.classList.remove("vip-player-fullscreen");
   document.body.classList.remove("vip-player-fullscreen");
 }
 
@@ -696,7 +576,6 @@ function cleanupAfterNativeFullscreenExit() {
   if (videoBox) {
     videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen", "vip-orientation-fallback");
   }
-  document.documentElement.classList.remove("vip-player-fullscreen");
   document.body.classList.remove("vip-player-fullscreen");
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
 }
