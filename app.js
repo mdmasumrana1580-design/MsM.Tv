@@ -1,4 +1,4 @@
-const PLAYLIST_URL = "https://raw.githubusercontent.com/mdmasumrana1580-design/Playlist-/refs/heads/main/Playlist";
+const PLAYLIST_URL = "https://raw.githubusercontent.com/mdmasumrana1580-design/Playlist-/refs/heads/main/MsM.Tv";
 const PLAYLIST_CACHE_KEY = "vip-network-last-good-playlist-v1";
 const PLAYLIST_REFRESH_MS = 10 * 60 * 1000;
 const STREAM_FALLBACK_URL = "https://mp3tourl.com/videos/1789615987340-af8196aa-b471-46d6-b1a6-ce56f31a1da8.mp4";
