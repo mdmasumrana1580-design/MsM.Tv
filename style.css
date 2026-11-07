@@ -4467,12 +4467,11 @@ html body > .desktop-layout > #playerSection > #vipVideoBox:fullscreen > .landsc
 }
 
 
-/* Hide the manual Desktop Mode button; device layout switches automatically */
-#desktopModeBtn,
-#desktopToggleBtn,
-.desktop-mode-toggle,
-.desktop-toggle,
-button[aria-label="ডেস্কটপ মোড"],
-button[title="ডেস্কটপ মোড"] {
-  display: none !important;
+/* User-requested slim red-to-green frame around the live video player */
+#playerSection .video-box {
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background:
+    linear-gradient(#000, #000) padding-box,
+    linear-gradient(110deg, #ff1025 0%, #ff2638 28%, #18e88a 100%) border-box;
 }
