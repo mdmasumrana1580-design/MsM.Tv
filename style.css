@@ -2598,7 +2598,7 @@ body.vip-player-fullscreen{overflow:hidden!important;background:#000!important;}
    1024px and above
 ================================ */
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
 
   html,
   body {
@@ -3816,7 +3816,7 @@ video{
    ========================================================= */
 
 /* Desktop / browser "Desktop site" viewport */
-@media screen and (min-width: 650px) {
+@media screen and (min-width: 650px) and (hover: hover) and (pointer: fine) {
   html, body {
     width:100% !important;
     height:100% !important;
@@ -4076,7 +4076,7 @@ video{
 }
 
 /* Wide desktop: slightly wider player and four channel cards per row. */
-@media screen and (min-width:1200px) {
+@media screen and (min-width:1200px) and (hover: hover) and (pointer: fine) {
   body > .desktop-layout {
     grid-template-columns:minmax(0,2.05fr) minmax(420px,.95fr) !important;
   }
@@ -4123,7 +4123,7 @@ video{
    keep the player media filling its frame, keep notice below.
    Only the channel grid scrolls. Portrait mobile is untouched.
    ============================================================ */
-@media screen and (min-width: 650px) {
+@media screen and (min-width: 650px) and (hover: hover) and (pointer: fine) {
   html, body {
     width: 100% !important;
     height: 100% !important;
@@ -4457,30 +4457,11 @@ html body > .desktop-layout > #playerSection > #vipVideoBox:fullscreen > .landsc
 }
 
 
-/* MsM.Tv: desktop-mode switch — matching the red/green desktop theme */
-.desktop-mode-toggle{
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:5px!important;
-  min-width:74px!important;
-  height:38px!important;
-  padding:0 10px!important;
-  border:1px solid #00d96b!important;
-  border-radius:10px!important;
-  background:linear-gradient(115deg,#a90019 0%,#15100e 48%,#006b35 100%)!important;
-  color:#fff!important;
-  font:800 11px Arial,sans-serif!important;
-  white-space:nowrap!important;
-  box-shadow:0 0 10px #00d96b35, inset 0 0 8px #ff203025!important;
-  cursor:pointer!important;
-}
-.desktop-mode-toggle.active{
-  border-color:#ff334d!important;
-  background:linear-gradient(115deg,#006b35 0%,#111 48%,#b40020 100%)!important;
-  box-shadow:0 0 12px #ff203045, inset 0 0 8px #00e67625!important;
-}
-.desktop-mode-toggle:focus-visible{outline:2px solid #fff!important;outline-offset:2px!important}
-@media(max-width:420px){
-  .desktop-mode-toggle{height:34px!important;min-width:65px!important;padding:0 7px!important;font-size:10px!important}
+/* MsM.Tv automatic device layout:
+   Desktop layout requires a real fine-pointer/hover device.
+   Touch-first phones stay on the original mobile UI even if "Desktop site" is enabled. */
+@media screen and (hover: none), screen and (pointer: coarse) {
+  body > .desktop-layout {
+    display: contents !important;
+  }
 }
