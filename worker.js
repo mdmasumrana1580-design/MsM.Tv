@@ -73,7 +73,7 @@ async function readSettings(e) { try { return JSON.parse((await kv(e).get(SETTIN
 async function readUsers(e) { try { return JSON.parse((await kv(e).get(USERS_KEY)) || '[]'); } catch { return []; } }
 async function saveUsers(e, x) { await kv(e).put(USERS_KEY, JSON.stringify(x)); }
 async function readOnline(e) { try { return JSON.parse((await kv(e).get(ONLINE_KEY)) || '{}'); } catch { return {}; } }
-async function saveOnline(e, x) { await kv(e).put(ONLINE_KEY, JSON.stringify(x), { expirationTtl: 3600 }); }
+async function saveOnline(e, x) { await kv(e).put(ONLINE_KEY, JSON.stringify(x), { expirationTtl: 120 }); }
 async function readPayments(e) { try { return JSON.parse((await kv(e).get(PAYMENTS_KEY)) || '[]'); } catch { return []; } }
 async function savePayments(e, x) { await kv(e).put(PAYMENTS_KEY, JSON.stringify(x)); }
 function paymentConfig(s = {}) {
@@ -90,7 +90,7 @@ function paymentConfig(s = {}) {
 function cleanOnline(x, now = Date.now()) {
   const out = {};
   for (const [k, v] of Object.entries(x || {})) {
-    if (typeof v === 'number' && now - v < 35 * 60 * 1000) out[k] = v;
+    if (typeof v === 'number' && now - v < 60000) out[k] = v;
   }
   return out;
 }
@@ -245,18 +245,14 @@ async function handle(r, e) {
     const b = await r.json().catch(() => ({})), id = String(b.id || '').slice(0, 160);
     if (!id) return withCors(json({ ok: false, error: 'id required' }, 400));
     const now = Date.now(), online = cleanOnline(await readOnline(e), now);
-    const previous = Number(online[id] || 0);
-    // KV is updated at most once per visitor per 10 minutes.
-    if (!previous || now - previous >= 10 * 60 * 1000) {
-      online[id] = now;
-      await saveOnline(e, online);
-    }
+    online[id] = now;
+    await saveOnline(e, online);
     return withCors(json({ ok: true, online: Object.keys(online).length }));
   }
 
   if (p === '/api/online' && r.method === 'GET') {
-    // Keep this endpoint read-only: cleaning expired entries must not consume KV writes.
-    const online = cleanOnline(await readOnline(e));
+    const raw = await readOnline(e), online = cleanOnline(raw);
+    if (Object.keys(raw).length !== Object.keys(online).length) await saveOnline(e, online);
     return withCors(json({ ok: true, online: Object.keys(online).length }));
   }
 
@@ -383,25 +379,9 @@ async function handle(r, e) {
     const now=new Date().toISOString(), number=String(b.number||b.phone||'').trim().slice(0,30), ip=clientIP(r);
     const deviceName=String(b.deviceName||b.name||'Mobile Device').slice(0,100);
     const explicitUserName=String(b.userName||b.username||'').trim().slice(0,100);
-    let shouldSave=false;
-    if(!d){
-      d={deviceId:id,name:deviceName,deviceName,userName:explicitUserName||'Guest',username:explicitUserName||'Guest',number,ip,userAgent:String(b.userAgent||r.headers.get('user-agent')||'').slice(0,200),approved:true,blocked:false,status:'Logged in',createdAt:now,lastSeen:now,lastLoginAt:now,lastLoginBD:bangladeshTime(now)};
-      ds.push(d); shouldSave=true;
-    } else {
-      const oldSeen=Date.parse(d.lastSeen||d.lastLoginAt||0)||0;
-      if(deviceName && d.deviceName!==deviceName){d.name=deviceName;d.deviceName=deviceName;shouldSave=true;}
-      if(explicitUserName && d.userName!==explicitUserName){d.userName=explicitUserName;d.username=explicitUserName;shouldSave=true;}
-      if(number && d.number!==number){d.number=number;shouldSave=true;}
-      if(!d.ip && ip){d.ip=ip;shouldSave=true;}
-      if(!d.userAgent && b.userAgent){d.userAgent=String(b.userAgent).slice(0,200);shouldSave=true;}
-      if(d.approved!==true){d.approved=true;shouldSave=true;}
-      if(d.status!=='Logged in'){d.status='Logged in';shouldSave=true;}
-      if(Date.now()-oldSeen>=6*60*60*1000){
-        d.lastSeen=now;d.lastLoginAt=now;d.lastLoginBD=bangladeshTime(now);shouldSave=true;
-      }
-    }
-    if(shouldSave) await saveDevices(e,ds);
-    return withCors(json({ok:true,autoLogin:true,device:d,settings:await readSettings(e)}));
+    if(!d){ d={deviceId:id,name:deviceName,deviceName,userName:explicitUserName||'Guest',username:explicitUserName||'Guest',number,ip,userAgent:String(b.userAgent||r.headers.get('user-agent')||'').slice(0,200),approved:true,blocked:false,status:'Logged in',createdAt:now,lastSeen:now,lastLoginAt:now,lastLoginBD:bangladeshTime(now)}; ds.push(d); }
+    else { d.name=deviceName||d.name; d.deviceName=deviceName||d.deviceName||d.name; if(explicitUserName){d.userName=explicitUserName;d.username=explicitUserName;} d.number=number||d.number||''; d.ip=ip||d.ip||'—'; d.approved=true; d.blocked=false; d.status='Logged in'; d.lastSeen=now; d.lastLoginAt=now; d.lastLoginBD=bangladeshTime(now); }
+    await saveDevices(e,ds); return withCors(json({ok:true,autoLogin:true,device:d,settings:await readSettings(e)}));
   }
 
   if (p === '/api/guest/register' && r.method === 'POST') {
@@ -410,18 +390,9 @@ async function handle(r, e) {
     const ds = await readDevices(e); let d = ds.find(x => x.deviceId === id);
     if (d?.blocked) return withCors(json({ ok:false, blocked:true, error:'Blocked' },403));
     const now=new Date().toISOString(), ip=clientIP(r), deviceName=String(b.deviceName||'Guest Device').slice(0,100);
-    let shouldSave=false;
-    if(!d){ d={deviceId:id,name:deviceName,deviceName,userName:'Guest',username:'Guest',number:'',ip,userAgent:r.headers.get('user-agent')||'',approved:true,blocked:false,status:'Logged in',createdAt:now,lastSeen:now,lastLoginAt:now,lastLoginBD:bangladeshTime(now)}; ds.push(d); shouldSave=true; }
-    else {
-      const oldSeen=Date.parse(d.lastSeen||d.lastLoginAt||0)||0;
-      if(d.name!==deviceName){d.name=deviceName;d.deviceName=deviceName;shouldSave=true;}
-      if(!d.userName){d.userName='Guest';d.username='Guest';shouldSave=true;}
-      if(!d.ip&&ip){d.ip=ip;shouldSave=true;}
-      if(d.approved!==true){d.approved=true;shouldSave=true;}
-      if(d.status!=='Logged in'){d.status='Logged in';shouldSave=true;}
-      if(Date.now()-oldSeen>=6*60*60*1000){d.lastSeen=now;d.lastLoginAt=now;d.lastLoginBD=bangladeshTime(now);shouldSave=true;}
-    }
-    if(shouldSave) await saveDevices(e,ds);
+    if(!d){ d={deviceId:id,name:deviceName,deviceName,userName:'Guest',username:'Guest',number:'',ip,userAgent:r.headers.get('user-agent')||'',approved:true,blocked:false,status:'Logged in',createdAt:now,lastSeen:now,lastLoginAt:now,lastLoginBD:bangladeshTime(now)}; ds.push(d); }
+    else { d.name=deviceName; d.deviceName=deviceName; d.userName=d.userName||'Guest'; d.username=d.userName; d.ip=ip; d.approved=true; d.status='Logged in'; d.lastSeen=now; d.lastLoginAt=now; d.lastLoginBD=bangladeshTime(now); }
+    await saveDevices(e,ds);
     const t=token();
     await kv(e).put(USER_SESSION_PREFIX+t,JSON.stringify({userId:null,username:d.userName||'Guest',deviceId:id,guest:true}),{expirationTtl:USER_TTL});
     return withCors(json({ok:true,autoLogin:true,guest:true,device:d},200,{headers:{'Set-Cookie':`VIP_USER_SESSION=${encodeURIComponent(t)}; Max-Age=${USER_TTL}; Path=/; HttpOnly; Secure; SameSite=Lax`}}));
