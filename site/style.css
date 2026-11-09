@@ -4093,3 +4093,17 @@ video{
     grid-template-columns:repeat(3,minmax(0,1fr)) !important;
   }
 }
+
+/* DESKTOP VIDEO FILL FIX: fill the complete desktop player frame.
+   Scoped to desktop layout only; mobile video behavior remains unchanged. */
+@media screen and (min-width: 650px) {
+  body > .desktop-layout > .desktop-left > #playerSection .video-box > video,
+  body > .desktop-layout > .desktop-left > #playerSection .video-box .welcome-video,
+  body > .desktop-layout #playerSection #video,
+  body > .desktop-layout #playerSection .welcome-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
