@@ -3824,3 +3824,272 @@ video{
     linear-gradient(#000, #000) padding-box,
     linear-gradient(110deg, #ff1025 0%, #ff2638 28%, #18e88a 100%) border-box;
 }
+
+/* DESKTOP-ONLY RESTORE: use the existing project desktop layout on wide viewports, including Android Chrome Desktop site. */
+@media screen and (min-width: 650px) {
+  html, body {
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
+    background:#03070b !important;
+  }
+  body {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    box-sizing:border-box !important;
+  }
+  body > .header {
+    order:1 !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 76px !important;
+    width:100% !important;
+    height:76px !important;
+    min-height:76px !important;
+    margin:0 !important;
+    padding:0 24px !important;
+    z-index:50 !important;
+  }
+  body > #cats.cats {
+    order:2 !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 62px !important;
+    width:100% !important;
+    height:62px !important;
+    min-height:62px !important;
+    margin:0 !important;
+    padding:7px 18px !important;
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:14px !important;
+    overflow:hidden !important;
+    background:#03070b !important;
+    border-bottom:1px solid #102b25 !important;
+    z-index:40 !important;
+  }
+  body > #cats.cats button {
+    flex:0 0 auto !important;
+    min-width:112px !important;
+    height:44px !important;
+    padding:0 18px !important;
+    font-size:15px !important;
+  }
+  body > .desktop-layout {
+    order:3 !important;
+    display:grid !important;
+    grid-template-columns:minmax(0, 2.05fr) minmax(360px, 0.95fr) !important;
+    grid-template-rows:minmax(0,1fr) !important;
+    gap:14px !important;
+    width:100% !important;
+    flex:1 1 0 !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:10px 14px 12px !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+    align-items:stretch !important;
+  }
+  body > .desktop-layout > .desktop-left {
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    align-items:stretch !important;
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+  body > .desktop-layout > .desktop-right {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:9px !important;
+    gap:9px !important;
+    overflow:hidden !important;
+    overscroll-behavior:contain !important;
+    border:1px solid #075b36 !important;
+    border-radius:16px !important;
+    background:linear-gradient(160deg,#050d12,#03080c) !important;
+    box-sizing:border-box !important;
+  }
+
+  /* Left column: player and notice are fixed in the viewport. */
+  body > .desktop-layout .desktop-left > #playerSection {
+    display:block !important;
+    position:relative !important;
+    inset:auto !important;
+    top:auto !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    float:none !important;
+    transform:none !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    max-width:none !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 0 10px 0 !important;
+    padding:7px !important;
+    box-sizing:border-box !important;
+    border:2px solid transparent !important;
+    border-radius:15px !important;
+    background:
+      linear-gradient(#05090d,#05090d) padding-box,
+      linear-gradient(110deg,#ff1838,#e7a12c,#00e86a) border-box !important;
+    box-shadow:0 0 15px #00b86b20,0 0 12px #ff193322 !important;
+    overflow:hidden !important;
+    z-index:2 !important;
+  }
+  body > .desktop-layout .desktop-left > #playerSection .player-head {
+    display:none !important;
+  }
+  body > .desktop-layout .desktop-left > #playerSection #vipVideoBox,
+  body > .desktop-layout .desktop-left > #playerSection .video-box {
+    display:block !important;
+    position:relative !important;
+    inset:auto !important;
+    transform:none !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:16 / 9 !important;
+    overflow:hidden !important;
+    border-radius:9px !important;
+  }
+  body > .desktop-layout .desktop-left > #playerSection #video,
+  body > .desktop-layout .desktop-left > #playerSection .welcome-video {
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+  }
+  body > .desktop-layout .desktop-left > #playerSpacer {
+    display:none !important;
+  }
+  body > .desktop-layout .desktop-left > .headline {
+    display:flex !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 48px !important;
+    width:100% !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+    z-index:2 !important;
+  }
+  body > .desktop-layout .desktop-left > .blue-line {
+    display:none !important;
+  }
+
+  /* Right column: search is static; ONLY #grid gets a scrollbar. */
+  body > .desktop-layout .desktop-right > .channel-search-wrap {
+    display:flex !important;
+    position:relative !important;
+    inset:auto !important;
+    flex:0 0 48px !important;
+    width:100% !important;
+    height:48px !important;
+    min-height:48px !important;
+    margin:0 !important;
+    z-index:5 !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid {
+    display:grid !important;
+    position:relative !important;
+    inset:auto !important;
+    transform:none !important;
+    flex:1 1 0 !important;
+    width:100% !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 2px 12px !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    grid-auto-rows:max-content !important;
+    align-content:start !important;
+    align-items:stretch !important;
+    gap:10px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:#146b4b #071016 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-sizing:border-box !important;
+    z-index:2 !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid::-webkit-scrollbar {
+    width:6px !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid::-webkit-scrollbar-thumb {
+    background:#146b4b !important;
+    border-radius:8px !important;
+  }
+  body > .desktop-layout .desktop-right > #grid .card {
+    position:relative !important;
+    width:100% !important;
+    height:clamp(118px,17vh,168px) !important;
+    min-width:0 !important;
+    margin:0 !important;
+    border-radius:13px !important;
+  }
+  body > .desktop-layout .desktop-right > #grid .circle {
+    width:clamp(58px,7vw,92px) !important;
+    height:clamp(58px,7vw,92px) !important;
+  }
+  body > .desktop-layout .desktop-right > #grid .label {
+    left:4px !important;
+    right:4px !important;
+    bottom:4px !important;
+    font-size:clamp(10px,.9vw,13px) !important;
+  }
+  body > .desktop-layout .desktop-right > #empty {
+    display:none !important;
+  }
+  body > .desktop-layout .desktop-right > .site-footer {
+    display:block !important;
+    position:relative !important;
+    flex:0 0 auto !important;
+    width:100% !important;
+    margin:0 !important;
+    padding:6px 4px 2px !important;
+    text-align:center !important;
+    font-size:10px !important;
+    border-top:1px solid #123c31 !important;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  body > .desktop-layout {
+    grid-template-columns:minmax(0,2.05fr) minmax(420px,.95fr) !important;
+  }
+  body > .desktop-layout .desktop-right > #grid.grid {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
