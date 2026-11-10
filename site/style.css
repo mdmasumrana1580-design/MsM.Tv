@@ -4107,3 +4107,25 @@ video{
     object-position: center center !important;
   }
 }
+
+/* DESKTOP VIDEO FILL FIX V2
+   Higher-specificity selectors override the existing desktop object-fit:contain rule.
+   Scoped to the desktop layout only; mobile styles are untouched. */
+@media screen and (min-width: 650px) {
+  html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox > #video,
+  html body > .desktop-layout > .desktop-left > #playerSection > #vipVideoBox > #welcomeVideo {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    background: #000 !important;
+    transform: none !important;
+  }
+}
