@@ -4131,79 +4131,16 @@ video{
 }
 
 
-/* MsM.Tv final Zoom-to-Fill patch (all displays)
-   Keep the current page layout untouched. In fullscreen, stretch the video
-   viewport to the available screen and use cover so no letterbox bars remain.
-   This also targets videos nested by any player wrapper. */
-#vipVideoBox:fullscreen,
-#vipVideoBox:-webkit-full-screen,
-#vipVideoBox.vip-fullscreen,
-#vipVideoBox.is-fullscreen,
-#vipVideoBox.vip-css-fullscreen,
-.video-box.vip-fullscreen,
-.video-box.is-fullscreen,
-.video-box.vip-css-fullscreen {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  min-width: 100vw !important;
-  min-height: 100vh !important;
-  min-height: 100dvh !important;
-  max-width: none !important;
-  max-height: none !important;
-  aspect-ratio: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  background: #000 !important;
-  z-index: 2147483647 !important;
-}
-#vipVideoBox:fullscreen video,
-#vipVideoBox:-webkit-full-screen video,
-#vipVideoBox.vip-fullscreen video,
-#vipVideoBox.is-fullscreen video,
-#vipVideoBox.vip-css-fullscreen video,
-.video-box.vip-fullscreen video,
-.video-box.is-fullscreen video,
-.video-box.vip-css-fullscreen video {
-  position: absolute !important;
-  inset: 0 !important;
-  display: block !important;
+/* MsM.Tv fullscreen final override: fill the landscape display edge-to-edge. */
+#vipVideoBox:fullscreen > #video,
+#vipVideoBox:-webkit-full-screen > #video,
+.video-box.vip-css-fullscreen > #video,
+.video-box.vip-fullscreen > #video,
+.video-box.is-fullscreen > #video {
   width: 100% !important;
   height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
   max-width: none !important;
   max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
   object-fit: cover !important;
-  object-position: center center !important;
-  background: #000 !important;
-}
-#vipVideoBox:fullscreen .plyr,
-#vipVideoBox:-webkit-full-screen .plyr,
-#vipVideoBox.vip-fullscreen .plyr,
-#vipVideoBox.is-fullscreen .plyr,
-#vipVideoBox.vip-css-fullscreen .plyr,
-#vipVideoBox:fullscreen .plyr__video-wrapper,
-#vipVideoBox:-webkit-full-screen .plyr__video-wrapper,
-#vipVideoBox.vip-fullscreen .plyr__video-wrapper,
-#vipVideoBox.is-fullscreen .plyr__video-wrapper,
-#vipVideoBox.vip-css-fullscreen .plyr__video-wrapper {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  aspect-ratio: auto !important;
-  overflow: hidden !important;
   background: #000 !important;
 }
