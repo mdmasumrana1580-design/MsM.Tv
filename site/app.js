@@ -586,6 +586,32 @@ function isNativeFullscreen() {
   return isBrowserNativeFullscreen() || isCssPlayerFullscreen();
 }
 
+// Explicitly exit native fullscreen and clear the CSS fallback.
+async function exitNativeFullscreen() {
+  if (isBrowserNativeFullscreen()) {
+    try {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
+    } catch (e) {
+      console.warn("MsM.Tv: exiting native fullscreen failed", e);
+    }
+  }
+  if (videoBox) {
+    videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen", "vip-orientation-fallback");
+  }
+  document.body.classList.remove("vip-player-fullscreen");
+  try {
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  } catch (e) {}
+  const orientationHelp = document.getElementById("vipOrientationHelp");
+  if (orientationHelp) orientationHelp.remove();
+}
+
 // Important: native fullscreen and our CSS fullscreen are two different states.
 // Android can exit native fullscreen with its Back button without removing our
 // CSS class. Never treat that stale class as proof that native fullscreen is active.
@@ -604,7 +630,8 @@ async function toggleNativeFullscreen() {
   const wasPlaying = !video.paused && !video.ended;
   if (isNativeFullscreen()) {
     await exitNativeFullscreen();
-    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    cleanupAfterNativeFullscreenExit();
+    syncFullscreenState();
     restorePlayerGridScroll();
   } else {
     playerFullscreenGridScrollTop = grid ? grid.scrollTop : playerReturnGridScrollTop;
