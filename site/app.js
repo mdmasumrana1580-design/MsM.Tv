@@ -525,35 +525,53 @@ function play(c, clickedCard, retryOriginal, fromUserClick) {
 }
 
 async function requestNativeFullscreen() {
-  if (!videoBox) return;
+  if (!videoBox) return false;
   try {
     if (videoBox.requestFullscreen) {
       await videoBox.requestFullscreen({ navigationUI: "hide" });
-      return;
+      return true;
     }
     if (videoBox.webkitRequestFullscreen) {
       videoBox.webkitRequestFullscreen();
-      return;
+      return true;
     }
   } catch (e) {
-    // Fall through to CSS fullscreen if native fullscreen is unavailable/blocked.
+    console.warn("MsM.Tv: native fullscreen request failed", e);
   }
+  // CSS fallback is useful on browsers without the Fullscreen API, but it
+  // cannot physically rotate the phone.
   videoBox.classList.add("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
   document.body.classList.add("vip-player-fullscreen");
+  return false;
 }
 
-async function exitNativeFullscreen() {
-  try {
-    if (document.fullscreenElement && document.exitFullscreen) {
-      await document.exitFullscreen();
-    } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  } catch (e) {}
-  if (videoBox) {
-    videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen");
+async function lockPlayerLandscape() {
+  if (!screen.orientation || typeof screen.orientation.lock !== "function") {
+    return { ok:false, reason:"unsupported" };
   }
-  document.body.classList.remove("vip-player-fullscreen");
+  try {
+    await screen.orientation.lock("landscape");
+    return { ok:true };
+  } catch (e) {
+    console.warn("MsM.Tv: landscape orientation lock rejected", e);
+    return { ok:false, reason:e && e.name ? e.name : "blocked" };
+  }
+}
+
+function showOrientationHelp(reason) {
+  let msg = "এই ব্রাউজার থেকে Landscape ঘোরানোর অনুমতি পাওয়া যায়নি। Chrome-এ MsM.Tv Install করে আবার চেষ্টা করুন।";
+  if (reason === "unsupported") msg = "আপনার ব্রাউজারে Landscape Lock সুবিধা নেই। MsM.Tv Install করে Chrome-এ চেষ্টা করুন।";
+  let toast = document.getElementById("vipOrientationHelp");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "vipOrientationHelp";
+    toast.setAttribute("role", "status");
+    toast.style.cssText = "position:fixed;left:12px;right:12px;bottom:18px;z-index:2147483647;padding:12px 15px;border-radius:12px;background:rgba(12,18,30,.96);color:#fff;text-align:center;font:600 13px/1.45 system-ui,sans-serif;box-shadow:0 5px 24px #0008";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  clearTimeout(window.__vipOrientationHelpTimer);
+  window.__vipOrientationHelpTimer = setTimeout(function(){ toast.remove(); }, 6500);
 }
 
 function isBrowserNativeFullscreen() {
@@ -577,6 +595,8 @@ function cleanupAfterNativeFullscreenExit() {
     videoBox.classList.remove("vip-css-fullscreen", "vip-fullscreen", "is-fullscreen", "vip-orientation-fallback");
   }
   document.body.classList.remove("vip-player-fullscreen");
+  const orientationHelp = document.getElementById("vipOrientationHelp");
+  if (orientationHelp) orientationHelp.remove();
   try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
 }
 
@@ -588,10 +608,15 @@ async function toggleNativeFullscreen() {
     restorePlayerGridScroll();
   } else {
     playerFullscreenGridScrollTop = grid ? grid.scrollTop : playerReturnGridScrollTop;
-    await requestNativeFullscreen();
-    try {
-      if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
-    } catch (e) {}
+    const nativeFullscreen = await requestNativeFullscreen();
+    if (nativeFullscreen) {
+      // Try immediately after native fullscreen; Chrome requires a fullscreen
+      // browsing context for the Screen Orientation lock on Android.
+      const lockResult = await lockPlayerLandscape();
+      if (!lockResult.ok) showOrientationHelp(lockResult.reason);
+    } else {
+      showOrientationHelp("unsupported");
+    }
   }
   syncFullscreenState();
   setTimeout(syncFullscreenState, 120);
@@ -658,6 +683,9 @@ window.addEventListener("orientationchange", function () {
 });
 document.addEventListener("fullscreenchange", function () {
   cleanupAfterNativeFullscreenExit();
+  if (isBrowserNativeFullscreen()) {
+    lockPlayerLandscape().then(function(result){ if (!result.ok) showOrientationHelp(result.reason); });
+  }
   syncFullscreenState();
   if (!isBrowserNativeFullscreen()) {
     restorePlayerGridScroll();
@@ -667,6 +695,9 @@ document.addEventListener("fullscreenchange", function () {
 });
 document.addEventListener("webkitfullscreenchange", function () {
   cleanupAfterNativeFullscreenExit();
+  if (isBrowserNativeFullscreen()) {
+    lockPlayerLandscape().then(function(result){ if (!result.ok) showOrientationHelp(result.reason); });
+  }
   syncFullscreenState();
   if (!isBrowserNativeFullscreen()) {
     restorePlayerGridScroll();

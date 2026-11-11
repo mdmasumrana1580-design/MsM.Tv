@@ -4131,16 +4131,64 @@ video{
 }
 
 
-/* MsM.Tv fullscreen final override: fill the landscape display edge-to-edge. */
-#vipVideoBox:fullscreen > #video,
-#vipVideoBox:-webkit-full-screen > #video,
-.video-box.vip-css-fullscreen > #video,
-.video-box.vip-fullscreen > #video,
-.video-box.is-fullscreen > #video {
-  width: 100% !important;
-  height: 100% !important;
+/* MsM.Tv fullscreen correction (v32)
+   Preserve the complete broadcast frame. Unlike cover/fill, contain never crops
+   the source picture; any unused area remains black. */
+#vipVideoBox:fullscreen,
+#vipVideoBox:-webkit-full-screen,
+#vipVideoBox.vip-css-fullscreen,
+#vipVideoBox.vip-fullscreen,
+#vipVideoBox.is-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   max-width: none !important;
   max-height: none !important;
-  object-fit: cover !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  z-index: 2147483000 !important;
+  overflow: hidden !important;
+}
+#vipVideoBox:fullscreen > video#video,
+#vipVideoBox:-webkit-full-screen > video#video,
+#vipVideoBox.vip-css-fullscreen > video#video,
+#vipVideoBox.vip-fullscreen > video#video,
+#vipVideoBox.is-fullscreen > video#video {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  background: #000 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+#vipVideoBox:fullscreen > video.welcome-video,
+#vipVideoBox:-webkit-full-screen > video.welcome-video,
+#vipVideoBox.vip-css-fullscreen > video.welcome-video,
+#vipVideoBox.vip-fullscreen > video.welcome-video,
+#vipVideoBox.is-fullscreen > video.welcome-video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #000 !important;
+}
+html:has(#vipVideoBox:fullscreen),
+body.vip-player-fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
   background: #000 !important;
 }
