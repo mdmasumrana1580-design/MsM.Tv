@@ -4192,3 +4192,27 @@ body.vip-player-fullscreen {
   overflow: hidden !important;
   background: #000 !important;
 }
+
+
+/* MsM.Tv Stretch Screen mode: fill the player viewport without cropping.
+   This intentionally changes the picture proportions when source and screen
+   aspect ratios differ, as requested by the user. */
+#vipVideoBox:fullscreen > video#video,
+#vipVideoBox:-webkit-full-screen > video#video,
+#vipVideoBox.vip-css-fullscreen > video#video,
+#vipVideoBox.vip-fullscreen > video#video,
+#vipVideoBox.is-fullscreen > video#video,
+#vipVideoBox:fullscreen > video.welcome-video,
+#vipVideoBox:-webkit-full-screen > video.welcome-video,
+#vipVideoBox.vip-css-fullscreen > video.welcome-video,
+#vipVideoBox.vip-fullscreen > video.welcome-video,
+#vipVideoBox.is-fullscreen > video.welcome-video {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: fill !important;
+  object-position: center center !important;
+}
